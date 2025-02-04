@@ -14,8 +14,8 @@ import { Roles } from 'src/auth/roles-auth.decorator';
 import { RolesGuard } from 'src/auth/roles-auth.guard';
 
 @ApiTags('orders')
-@ApiBearerAuth()
 @Controller('orders')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class OrderController {
   constructor(

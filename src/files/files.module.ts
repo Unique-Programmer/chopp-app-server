@@ -6,6 +6,7 @@ import { FileModel } from './file.model';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Product } from 'src/products/product.model';
 import { ProductsModule } from 'src/products/products.module';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ProductsModule } from 'src/products/products.module';
     }),
     SequelizeModule.forFeature([FileModel, Product]),
     forwardRef(() => ProductsModule),
+    forwardRef(() => AuthModule),
   ],
   controllers: [FilesController],
   providers: [FilesService],

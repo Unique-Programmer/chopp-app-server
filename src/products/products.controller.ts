@@ -83,17 +83,12 @@
 //         );
 //         console.log('initialImagesArr: ', initialImagesParsed);
 
-
 //       } else {
 
 //         initialImagesParsed = [JSON.parse(productData.initialImages)];
 //         // initialImagesHashSet = new Set(
 //         //   initialImagesParsed.map((item) => item.hash),
 //         // );
-
-
-
-
 
 //         // const initialImage = JSON.parse(productData.initialImages);
 
@@ -227,7 +222,6 @@
 //   }
 // }
 
-
 import {
   Controller,
   Post,
@@ -240,16 +234,20 @@ import {
   Put,
   HttpException,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilesService } from '../files/files.service';
 import { ProductService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('products')
 @Controller('products')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class ProductsController {
   constructor(
     private readonly productService: ProductService,
@@ -268,9 +266,7 @@ export class ProductsController {
     @Body() productData: CreateProductDto,
   ) {
     try {
-      const imageUrls = await Promise.all(
-        files.images?.map((file) => this.filesService.uploadFile(file)) || [],
-      );
+      const imageUrls = await Promise.all(files.images?.map((file) => this.filesService.uploadFile(file)) || []);
       return this.productService.createProduct({
         ...productData,
         imageIds: imageUrls.map((item) => item.id),
@@ -290,27 +286,25 @@ export class ProductsController {
     @Param('id') id: number,
   ) {
     try {
-      const imageModels = await Promise.all(
-        files.images?.map((file) => this.filesService.uploadFile(file)) || [],
-      );
-      
+      const imageModels = await Promise.all(files.images?.map((file) => this.filesService.uploadFile(file)) || []);
+
       let initialImagesParsed: { id: number; hash: string }[] = [];
       let initialImagesHashSet = new Set<string>();
-      
+
       if (productData.initialImages) {
         initialImagesParsed = Array.isArray(productData.initialImages)
           ? productData.initialImages.map((item) => JSON.parse(item))
           : [JSON.parse(productData.initialImages)];
-        
+
         initialImagesHashSet = new Set(initialImagesParsed.map((item) => item.hash));
       }
-      
+
       const onlyNewUploadedImagesIds = imageModels
         .filter((item) => !initialImagesHashSet.has(item.hash))
         .map((item) => item.id);
 
       const initialImagesIds = initialImagesParsed.map((item) => item.id);
-      
+
       return this.productService.updateProduct({
         ...productData,
         imageIds: [...initialImagesIds, ...onlyNewUploadedImagesIds],
@@ -336,13 +330,6 @@ export class ProductsController {
     @Query('sort') sort?: string,
     @Query('order') order: 'ASC' | 'DESC' = 'ASC',
   ) {
-    return this.productService.findAllProducts(
-      Number(page),
-      Number(limit),
-      categoryId,
-      search,
-      sort,
-      order,
-    );
+    return this.productService.findAllProducts(Number(page), Number(limit), categoryId, search, sort, order);
   }
 }

@@ -13,8 +13,8 @@ import { CapturePaymentDto } from './dto/capture-payment.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
 
 @ApiTags('payments')
-@ApiBearerAuth()
 @Controller('payments')
+@ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class PaymentsController {
   constructor(private readonly paymentService: PaymentsService) {}

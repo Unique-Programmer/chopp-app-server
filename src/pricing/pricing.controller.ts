@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiTags, ApiResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CreatePricingConfigDto } from './dto/create-pricing-config.dto';
 import { PricingService } from './pricing.service';
 import { PricingConfig } from './pricing-config.model';
@@ -7,6 +7,8 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('pricing')
 @Controller('pricing')
+@UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
 export class PricingController {
   constructor(private pricingService: PricingService) {}
 
@@ -22,7 +24,6 @@ export class PricingController {
     status: 400,
     description: 'Bad request. Possible reasons: Invalid data in request body.',
   })
-  @UseGuards(JwtAuthGuard)
   createOrUpdateConfig(
     @Body() dto: CreatePricingConfigDto,
   ): Promise<PricingConfig> {
@@ -40,7 +41,6 @@ export class PricingController {
     status: 404,
     description: 'Pricing configuration not found.',
   })
-  @UseGuards(JwtAuthGuard)
   getConfig(): Promise<PricingConfig> {
     return this.pricingService.getConfig();
   }
