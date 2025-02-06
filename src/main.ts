@@ -21,9 +21,7 @@ async function bootstrap() {
     .setTitle("Chopp app's methods description")
     .setDescription('Note, when you need update info')
     .setVersion('1.0.0')
-    .addBearerAuth(
-      
-    )
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

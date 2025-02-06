@@ -9,8 +9,8 @@ services:
       - .env.development
     volumes:
       - .:/app
-      - /app/node_modules
-      # - ./node_modules:/app/node_modules
+      # - /app/node_modules
+      - ./node_modules:/app/node_modules
     ports:
       - 6001:6000
       - 9229:9229

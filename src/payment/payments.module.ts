@@ -9,7 +9,6 @@ import { Order } from 'src/order/order.model';
 import { Subscription } from './subscription.model';
 import { YooKassaWebhookService } from './yookassa-webhook.service';
 import { YooKassaWebhookController } from './yookassa-webhook.controller';
-import { OrderService } from 'src/order/order.service';
 import { OrderItem } from 'src/order/order-item.model';
 import { ShoppingCartItem } from 'src/shopping-cart/shopping-cart-item.model';
 import { NotificationModule } from 'src/websockets/notification/notification.module';

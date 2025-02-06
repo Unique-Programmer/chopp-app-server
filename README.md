@@ -4,7 +4,8 @@
 $ npm ci
 ```
 
-Do not use npm install, need install dependencies stict to package-lock.json file, vulnerabilities fix
+Instal node_modules locally. Docker container uses local node_modules folder
+Do not use npm install, need install dependencies strict to package-lock.json file, vulnerabilities fix
 
 ## Compile and run the project
 
@@ -22,9 +23,6 @@ $ npm run start:prod
 ## Docker
 
 ```bash
-# cp docker files to app root / dir: [development] or [production]
-$ cp docker/development/* ./
-
 # build container with params
 $ docker-compose build
 
