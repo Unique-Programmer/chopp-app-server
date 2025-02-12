@@ -26,7 +26,6 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 
 @ApiTags('users')
 @Controller('users')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export class UsersController {
   constructor(
@@ -68,6 +67,7 @@ export class UsersController {
   @ApiOperation({ summary: 'User creation' })
   @ApiResponse({ status: 200, type: User })
   @UsePipes(ValidationPipe)
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() userDto: CreateUserDto) {
     return this.usersService.createUser(userDto);
@@ -80,6 +80,7 @@ export class UsersController {
   @UseGuards(JwtAuthGuard)
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
+  @UseGuards(JwtAuthGuard)
   @Get()
   getAll(
     // need add params validation
