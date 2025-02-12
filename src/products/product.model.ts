@@ -12,6 +12,7 @@ import { Category } from 'src/categories/category.model';
 import { FileModel } from 'src/files/file.model';
 import { ProductFile } from './product-file.model';
 import { ShoppingCartItem } from 'src/shopping-cart/shopping-cart-item.model';
+import { ORDER_STATE } from 'src/shared/enums';
 
 @Table({ tableName: 'products' })
 export class Product extends Model<Product> {
@@ -40,6 +41,12 @@ export class Product extends Model<Product> {
     allowNull: false,
   })
   price: number;
+
+  @Column({
+    type: DataType.TEXT,
+    allowNull: false,
+  })
+  state: ORDER_STATE;
 
   @BelongsTo(() => Category)
   category: Category;

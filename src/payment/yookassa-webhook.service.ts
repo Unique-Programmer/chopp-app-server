@@ -1,11 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Subscription } from './subscription.model';
+import { NotificationService } from 'src/websockets/notification/notification.service';
 
 @Injectable()
 export class YooKassaWebhookService {
   constructor(
     @InjectModel(Subscription) private readonly subscriptionModel: typeof Subscription,
+    private readonly notificationService: NotificationService,
   ) {}
 
   // Создание новой подписки

@@ -13,7 +13,7 @@ export class WsJwtMiddleware {
 
     this.logger.log('--token: ', token);
     const decoded = this.jwtService.decode(token) as any;
-    const now = Math.floor(Date.now() / 1000);
+    const now = Math.ceil(Date.now() / 1000);
     this.logger.verbose('--Token exp:', decoded?.exp, 'Current time:', now);
     if (decoded?.exp < now) {
       this.logger.error('Token has expired');

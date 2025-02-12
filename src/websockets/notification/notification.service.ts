@@ -12,7 +12,7 @@ export class NotificationService {
     @InjectModel(User) private readonly userModel: typeof User,
   ) {}
 
-  async sendUserNotifications<T>({ recipientUserIds, message }: { recipientUserIds: number[]; message: WsMessage<T>; }) {
+  async sendUserNotification<T>({ recipientUserIds, message }: { recipientUserIds: number[]; message: WsMessage<T>; }) {
     await this.notificationGateway.sendNotificationToClients<T>(recipientUserIds, message);
   }
 

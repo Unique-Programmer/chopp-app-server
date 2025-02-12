@@ -122,7 +122,7 @@ export class OrderService {
         payload: order,
       });
 
-      await this.notificationService.sendUserNotifications<Order>({
+      await this.notificationService.sendUserNotification<Order>({
         recipientUserIds: [user.id],
         message: {
           type: WS_MESSAGE_TYPE.NEW_ORDER,
@@ -167,7 +167,7 @@ export class OrderService {
         id: item.product.id,
         title: item.product.title,
         price: item.product.price,
-        category: item.product.category?.title || 'Без категории',
+        category: item.product.category?.title || 'Другое',
         images: item.product.images, // Включаем изображения
       },
       quantity: item.quantity,
@@ -298,7 +298,7 @@ export class OrderService {
         payload: order,
       });
 
-      await this.notificationService.sendUserNotifications<Order>({
+      await this.notificationService.sendUserNotification<Order>({
         recipientUserIds: [order.userId],
         message: {
           type: WS_MESSAGE_TYPE.ORDER_STATUS,

@@ -123,7 +123,7 @@ export class PaymentsService {
       payload: body,
     });
 
-    await this.notificationService.sendUserNotifications({
+    await this.notificationService.sendUserNotification({
       recipientUserIds: [user.id],
       message: {
         type: WS_MESSAGE_TYPE.NEW_PAYMENT,

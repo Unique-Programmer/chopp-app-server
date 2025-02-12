@@ -141,6 +141,7 @@ export class PaymentsController {
       status?: string;
     },
   ): Promise<any> {
+    console.log('--queryParams; ', queryParams)
     return this.paymentService.getPayments(queryParams);
   }
 

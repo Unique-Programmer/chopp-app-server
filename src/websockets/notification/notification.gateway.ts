@@ -26,7 +26,7 @@ export class NotificationGateway extends BaseGateway  {
     recipientUserIds: number[], // Массив userId, которым нужно отправить уведомления
     message: WsMessage<T>, // Сообщение для отправки
   ) {
-    console.log('----sendNotificationToClientsL: ', recipientUserIds)
+    console.log('----sendNotificationToClients: ', recipientUserIds)
     const activeSockets = Array.from(this.server.sockets.sockets.values());
     const activeSessions = activeSockets.map((socket: Socket) => ({
       socketId: socket?.id,

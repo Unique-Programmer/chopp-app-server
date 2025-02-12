@@ -510,6 +510,6 @@ function randomize(items) {
   if (!Array.isArray(items) || items.length === 0) {
     throw new Error("Please provide a non-empty array.");
   }
-  const randomIndex = Math.floor(Math.random() * items.length);
+  const randomIndex = Math.ceil(Math.random() * items.length);
   return items[randomIndex];
 }
