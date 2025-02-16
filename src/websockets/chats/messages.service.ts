@@ -23,6 +23,7 @@ export class MessagesService {
     return await this.messageRepository.findAll({
       where: { chatId },
       include: { all: true },
+      order: [['createdAt', 'ASC']],
     });
   }
 }

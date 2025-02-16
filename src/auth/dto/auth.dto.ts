@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsOptional, IsString, Length } from 'class-validator';
+import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { USER_ROLE } from 'src/shared/enums';
 
 const PASSWORD_MINIMAL_LENGTH = 8;
 const PASSWORD_MAXIMUM_LENGTH = 16;
@@ -27,6 +28,10 @@ export class AuthDto {
     message: `Password must be from ${PASSWORD_MINIMAL_LENGTH} to ${PASSWORD_MAXIMUM_LENGTH} characters`,
   })
   readonly password: string;
+
+  @ApiProperty({ example: USER_ROLE.USER, description: 'User role' })
+  @IsEnum(USER_ROLE, { message: 'Must be a valid USER_ROLE value' })
+  readonly context: USER_ROLE;
 }
 
 export class RefreshDto {

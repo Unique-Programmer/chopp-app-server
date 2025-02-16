@@ -209,7 +209,10 @@ export class ChatsService {
         include: [
           [
             Sequelize.literal(`(
-              SELECT "text"
+              SELECT json_build_object(
+                'text', "Message"."text",
+                'createdAt', "Message"."createdAt"
+              )
               FROM "messages" AS "Message"
               INNER JOIN "chat_messages" AS "ChatMessages"
               ON "Message"."id" = "ChatMessages"."messageId"
@@ -227,9 +230,11 @@ export class ChatsService {
       const users = chat.users || [];
       const filteredUsers = users.filter((user: User) => user.id !== currentUserId);
       const fullNames = filteredUsers.map((user: User) => user.fullName);
+
       return {
         ...chat.toJSON(),
         fullName: fullNames.join(', '),
+        lastMessage: chat.getDataValue('lastMessage') ? chat.getDataValue('lastMessage') : null,
       };
     });
   }
