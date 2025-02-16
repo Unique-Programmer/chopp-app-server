@@ -23,9 +23,9 @@ export class Message extends Model {
   @Column({ type: DataType.STRING, allowNull: false })
   text: string;
 
-  @ForeignKey(() => User)
-  @Column({ allowNull: true })
-  wasReadBy: number;
+  @ApiProperty({ example: '[1, 2, 3]', description: 'Array of user IDs who read the message' })
+  @Column({ type: DataType.ARRAY(DataType.INTEGER), allowNull: false, defaultValue: [] })
+  wasReadBy: number[];
 
   @ForeignKey(() => User)
   @Column({ allowNull: true })

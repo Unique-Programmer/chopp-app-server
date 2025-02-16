@@ -9,11 +9,11 @@ import {
 import { Socket } from 'socket.io';
 import { BaseGateway } from '../gateways/base.gateway';
 import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
-import { ActiveSessionService } from '../active-sessions/active-session.service';
 import { ChatsService } from './chats.service';
 import { Message } from './messages.model';
 import { Server } from 'socket.io';
 import { ActiveSocket } from 'src/shared/types';
+import { MessagesService } from './messages.service';
 
 @WebSocketGateway({ cors: true })
 export class ChatsGateway extends BaseGateway {
@@ -23,13 +23,14 @@ export class ChatsGateway extends BaseGateway {
   constructor(
     jwtMiddleware: WsJwtMiddleware,
     private chatsService: ChatsService,
+    private messagesService: MessagesService,
   ) {
     super(jwtMiddleware);
   }
 
   @SubscribeMessage('message')
   handleMessage(
-    @MessageBody() message: { payload: Message },
+    @MessageBody() message: Message,
     @ConnectedSocket() socket: Socket,
   ) {
     const user = socket.data.user;
@@ -44,8 +45,19 @@ export class ChatsGateway extends BaseGateway {
       socketId: socket?.id,
       userId: socket?.data?.user?.id,
     }));
-    
-    this.chatsService.handleMessage(socket, activeSessions, message.payload, user.id);
+
+    this.chatsService.handleMessage(socket, activeSessions, message, user.id);
+  }
+
+  @SubscribeMessage('messagesRead')
+  handleMessagesRead(
+    @MessageBody() data: { chatId: string },
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const user = socket.data.user;
+    if (!user) return;
+
+    this.messagesService.markAllMessagesAsRead(Number(data.chatId), user.id);
   }
 }
 
