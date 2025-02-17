@@ -1,13 +1,14 @@
-import { Body, Controller, Get, Post, UnauthorizedException, UseGuards, Headers, Param } from '@nestjs/common';
+import { Body, Controller, Get, Post, UnauthorizedException, UseGuards, Headers, Param, Req } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ChatsService } from './chats.service';
 import { Chat } from './chats.model';
-import { CreateChatDto } from './dto/create-chat.to';
+import { CreateChatDto } from './dto/create-chat.dto';
 import { UsersService } from 'src/users/users.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { MessagesService } from './messages.service';
 import { Message } from './messages.model';
+import { ChatStatsDto } from './dto/chat-stats.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -80,5 +81,13 @@ export class ChatsController {
     } else { 
       return [];
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Get('stats')
+  async getUserChatStats(@Req() req): Promise<ChatStatsDto> {
+    //TODO: do the same user token parcing in all places
+    const userId = req.user.id;
+    return this.chatsService.getUserChatStats(userId);
   }
 }

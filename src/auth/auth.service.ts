@@ -6,6 +6,7 @@ import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
 import { ERRORS } from 'src/shared/enums/errors';
+import { USER_ROLE } from 'src/shared/enums';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
     private usersService: UsersService,
     // chnage to passport js
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   private async generateTokens(user: User) {
     const payload = { email: user.email, id: user.id, roles: user.roles };
@@ -30,7 +31,14 @@ export class AuthService {
     };
   }
 
+  private checkByRoleContext(user: User, context: USER_ROLE): boolean {
+    const [role] = user.roles;
+
+    return role.value === context;
+  }
+
   private async checkValidityUser(authDto: AuthDto) {
+
     let user;
 
     console.log('authDto: ', authDto);
@@ -48,7 +56,14 @@ export class AuthService {
       throw new UnauthorizedException({ message: ERRORS.INCORRECT_LOGIN_OR_PASSWORD });
     }
 
-    const isPasswordsEquals = await bcrypt.compare(authDto.password, user.password);
+    if (!this.checkByRoleContext(user, authDto.context)) {
+      throw new HttpException('Access denied for this role', HttpStatus.FORBIDDEN);
+    };
+
+    const isPasswordsEquals = await bcrypt.compare(
+      authDto.password,
+      user.password,
+    );
     if (!isPasswordsEquals) {
       throw new UnauthorizedException({ message: ERRORS.INCORRECT_LOGIN_OR_PASSWORD });
     }

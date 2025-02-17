@@ -9,15 +9,17 @@ import { Sequelize } from 'sequelize';
 import { Socket } from 'socket.io';
 import { getActiveRecipientsIds } from 'src/shared/utils/chat-utils';
 import { ActiveSocket } from 'src/shared/types';
+import { UserChats } from './user-chats.model';
+import { ChatStatsDto } from './dto/chat-stats.dto';
 
 @Injectable()
 export class ChatsService {
   constructor(
-    @InjectModel(Chat)
-    private chatRepository: typeof Chat,
+    @InjectModel(Chat) private chatRepository: typeof Chat,
+    @InjectModel(UserChats) private userChatsModel: typeof UserChats,
     private usersService: UsersService,
     private messagesService: MessagesService,
-  ) {}
+  ) { }
 
   // Getting chat history
   async getChatHistory(chatId: number) {
@@ -190,6 +192,7 @@ export class ChatsService {
   }
 
   async getAllChats(currentUserId: number) {
+    //TODO: change it to search in intermediate table for optimization
     const chats = await this.chatRepository.findAll({
       include: [
         {
@@ -209,7 +212,10 @@ export class ChatsService {
         include: [
           [
             Sequelize.literal(`(
-              SELECT "text"
+              SELECT json_build_object(
+                'text', "Message"."text",
+                'createdAt', "Message"."createdAt"
+              )
               FROM "messages" AS "Message"
               INNER JOIN "chat_messages" AS "ChatMessages"
               ON "Message"."id" = "ChatMessages"."messageId"
@@ -227,9 +233,11 @@ export class ChatsService {
       const users = chat.users || [];
       const filteredUsers = users.filter((user: User) => user.id !== currentUserId);
       const fullNames = filteredUsers.map((user: User) => user.fullName);
+
       return {
         ...chat.toJSON(),
         fullName: fullNames.join(', '),
+        lastMessage: chat.getDataValue('lastMessage') ? chat.getDataValue('lastMessage') : null,
       };
     });
   }
@@ -244,5 +252,29 @@ export class ChatsService {
         },
       ],
     });
+  }
+
+  async getUserChatStats(userId: number): Promise<ChatStatsDto> {
+    //TODO: clarify how statistics should be displayed, convert to an intermediate table for optimization  
+    const chatsWithMessages = await this.chatRepository.findAll({
+      include: [
+        {
+          model: User,
+          where: { id: userId },
+          required: true,
+        },
+        {
+          model: Message,
+          required: false,
+        },
+      ],
+    });
+
+    const total = chatsWithMessages.length;
+    const read = chatsWithMessages.filter((chat) => 
+      chat.messages.every((message) => message.wasReadBy.includes(userId)))
+    const unread = total - read.length;
+
+    return { read: read.length, unread, total };
   }
 }
