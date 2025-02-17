@@ -36,7 +36,7 @@ export abstract class BaseGateway
 
       client.data.user = user;
 
-      // Обновление или создание записи о сессии
+      // TODO: can be used if need save sessions
       // await this.activeSessionService.upsertSession(user.id, client.id);
 
       console.log(`User ${user.id} connected with sid ${client.id}`);
