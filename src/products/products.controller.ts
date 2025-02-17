@@ -100,26 +100,28 @@ export class ProductsController {
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Search by title or description' })
   @ApiQuery({ name: 'sort', required: false, type: String, description: 'Sort key' })
   @ApiQuery({ name: 'order', required: false, type: String, enum: ['ASC', 'DESC'], description: 'Sort order' })
-  @ApiQuery({ name: 'state', required: false, type: String, description: 'Filter by product state' })
-async getAllProducts(
-  @Query('page') page = 1,
-  @Query('limit') limit = 10,
-  @Query('categoryId') categoryId?: number,
-  @Query('search') search?: string,
-  @Query('sort') sort?: string,
-  @Query('order') order: 'ASC' | 'DESC' = 'ASC',
-  @Query('state') state?: ORDER_STATE, // Новый параметр
-) {
-  return this.productService.findAllProducts(
-    Number(page),
-    Number(limit),
-    categoryId,
-    search,
-    sort,
-    order,
-    state, // Передаем новый параметр
-  );
-}
+  @ApiQuery({ name: 'state', required: false, type: [String], description: 'Filter by product state' }) // Массив состояний
+  async getAllProducts(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+    @Query('categoryId') categoryId?: number,
+    @Query('search') search?: string,
+    @Query('sort') sort?: string,
+    @Query('order') order: 'ASC' | 'DESC' = 'ASC',
+    @Query('state') state?: ORDER_STATE | ORDER_STATE[], // Массив состояний
+  ) {
+    const stateArray = Array.isArray(state) ? state : state ? [state] : undefined;
+
+    return this.productService.findAllProducts(
+      Number(page),
+      Number(limit),
+      categoryId,
+      search,
+      sort,
+      order,
+      stateArray, // Передаем массив состояний
+    );
+  }
 
   @Patch(':id/state')
   @ApiBody({

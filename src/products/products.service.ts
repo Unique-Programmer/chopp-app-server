@@ -21,10 +21,7 @@ export class ProductService {
     });
 
     if (existingProduct) {
-      throw new HttpException(
-        'Product with this title already exists',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Product with this title already exists', HttpStatus.BAD_REQUEST);
     }
 
     const product = await this.productRepository.create({
@@ -33,7 +30,7 @@ export class ProductService {
       price: dto.price,
       categoryId: dto.categoryId,
       imagesOrder: dto.imageIds,
-      state: dto.state
+      state: dto.state,
     });
 
     if (dto.imageIds?.length) {
@@ -56,7 +53,7 @@ export class ProductService {
       price: dto.price,
       categoryId: dto.categoryId,
       imagesOrder: dto.imageIds,
-      state: dto.state
+      state: dto.state,
     });
 
     if (dto.imageIds?.length) {
@@ -87,10 +84,10 @@ export class ProductService {
     search?: string,
     sort: string = 'id',
     order: string = 'ASC',
-    state?: ORDER_STATE, // Новый параметр
+    state?: ORDER_STATE[], // Массив состояний
   ) {
     const offset = (pageNumber - 1) * limit;
-  
+
     const whereCondition: any = {};
     if (categoryId) whereCondition.categoryId = categoryId;
     if (search) {
@@ -99,25 +96,23 @@ export class ProductService {
         { description: { [Op.iLike]: `%${search}%` } },
       ];
     }
-    if (state) whereCondition.state = state; // Добавляем условие по state
-  
+    if (state && state.length > 0) {
+      whereCondition.state = { [Op.in]: state }; // Фильтр по массиву состояний
+    }
+
     const validSortColumns = ['id', 'title', 'price', 'createdAt', 'updatedAt'];
     if (!validSortColumns.includes(sort)) sort = 'id';
     order = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
-  
-    const { rows: items, count: totalItems } =
-      await this.productRepository.findAndCountAll({
-        where: whereCondition,
-        limit,
-        offset,
-        order: [[sort, order]],
-        include: [
-          { model: FileModel, as: 'images' },
-          { model: Category },
-        ],
-        attributes: { exclude: ['categoryId'] },
-      });
-  
+
+    const { rows: items, count: totalItems } = await this.productRepository.findAndCountAll({
+      where: whereCondition,
+      limit,
+      offset,
+      order: [[sort, order]],
+      include: [{ model: FileModel, as: 'images' }, { model: Category }],
+      attributes: { exclude: ['categoryId'] },
+    });
+
     return {
       items,
       totalItems,
