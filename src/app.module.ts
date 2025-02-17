@@ -31,6 +31,7 @@ import { Order } from './order/order.model';
 import { PaymentsModule } from './payment/payments.module';
 import { OrderItem } from './order/order-item.model';
 import { Subscription } from './payment/subscription.model';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -64,7 +65,7 @@ import { Subscription } from './payment/subscription.model';
         ShoppingCartItem,
         Order,
         OrderItem,
-        Subscription
+        Subscription,
       ],
       autoLoadModels: true,
     }),
@@ -80,7 +81,8 @@ import { Subscription } from './payment/subscription.model';
     FilesModule,
     ShoppingCartModule,
     OrderModule,
-    PaymentsModule
+    PaymentsModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [],
