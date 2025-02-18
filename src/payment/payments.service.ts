@@ -159,7 +159,6 @@ export class PaymentsService {
       metadata: { order_id: order.id },
       user: order.user,
       items: order.items,
-      
     });
 
     order.transactionId = paymentResult.id;
