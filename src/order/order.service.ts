@@ -187,8 +187,7 @@ export class OrderService {
       address: plainOrder.address,
       items, // Включаем агрегированные товары
     } as unknown as Order;
-}
-
+  }
 
   async findAllOrders({
     page = 1,

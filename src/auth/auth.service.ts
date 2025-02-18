@@ -1,15 +1,11 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { CreateUserDto, UserRO } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
+import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
 
 @Injectable()
@@ -47,25 +43,17 @@ export class AuthService {
 
     console.log('authDto: ', authDto);
     if (authDto.email) {
-      user = await this.usersService.getUserByFieldName(
-        authDto.email,
-        'email',
-        true,
-      );
+      user = await this.usersService.getUserByFieldName(authDto.email, 'email', true);
     } else if (authDto.phoneNumber) {
-      user = await this.usersService.getUserByFieldName(
-        authDto.phoneNumber,
-        'phoneNumber',
-        true,
-      );
+      user = await this.usersService.getUserByFieldName(authDto.phoneNumber, 'phoneNumber', true);
     } else {
       throw new UnauthorizedException({
-        message: 'User not found',
+        message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD,
       });
     }
 
     if (!user) {
-      throw new UnauthorizedException({ message: 'User not found.' });
+      throw new UnauthorizedException({ message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD });
     }
 
     if (!this.checkByRoleContext(user, authDto.context)) {
@@ -77,7 +65,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordsEquals) {
-      throw new UnauthorizedException({ message: 'User not found..' });
+      throw new UnauthorizedException({ message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD });
     }
 
     return user;
@@ -89,28 +77,16 @@ export class AuthService {
   }
 
   async registration(userDto: CreateUserDto) {
-    const candidateByEmain = await this.usersService.getUserByFieldName(
-      userDto.email,
-      'email',
-    );
+    const candidateByEmain = await this.usersService.getUserByFieldName(userDto.email, 'email');
 
     if (candidateByEmain) {
-      throw new HttpException(
-        'User with this email already exist',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('User with this email already exist', HttpStatus.BAD_REQUEST);
     }
 
-    const candidateByPhoneNumber = await this.usersService.getUserByFieldName(
-      userDto.phoneNumber,
-      'phoneNumber',
-    );
+    const candidateByPhoneNumber = await this.usersService.getUserByFieldName(userDto.phoneNumber, 'phoneNumber');
 
     if (candidateByPhoneNumber) {
-      throw new HttpException(
-        'User with this phone number already exist',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('User with this phone number already exist', HttpStatus.BAD_REQUEST);
     }
 
     const hashPassword = await bcrypt.hash(userDto.password, 5);
@@ -137,10 +113,7 @@ export class AuthService {
       throw new UnauthorizedException({ message: 'Refresh token not found' });
     }
 
-    const payload = this.verifyToken(
-      refreshToken,
-      process.env.JWT_REFRESH_SECRET_HEX,
-    );
+    const payload = this.verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET_HEX);
 
     if (!payload) {
       throw new UnauthorizedException({ message: 'Invalid refresh token' });
@@ -152,34 +125,23 @@ export class AuthService {
       throw new UnauthorizedException({ message: 'Invalid user' });
     }
 
-    console.log('----this.generateTokens(user): ', this.generateTokens(user));
-
     return this.generateTokens(user);
   }
 
   async getUserByTokenPayload(accessToken: string) {
     try {
-      const payload = this.verifyToken(
-        accessToken,
-        process.env.JWT_ACCESS_SECRET_HEX,
-      );
+      const payload = this.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET_HEX);
       const user = await this.usersService.getUserByFieldName(payload.id, 'id');
 
       return user;
     } catch (e) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException(ERROR_MESSAGES.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
-  async authenticateSuperAdmin(
-    login: string,
-    password: string,
-  ): Promise<boolean> {
+  async authenticateSuperAdmin(login: string, password: string): Promise<boolean> {
     // Здесь должна быть логика для проверки учетных данных суперадмина,
     // например, сравнение с хранимыми значениями в переменных окружения
-    return (
-      login === process.env.SUPERADMIN_LOGIN &&
-      password === process.env.SUPERADMIN_PASSWORD
-    );
+    return login === process.env.SUPERADMIN_LOGIN && password === process.env.SUPERADMIN_PASSWORD;
   }
 }
