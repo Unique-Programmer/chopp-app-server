@@ -5,7 +5,7 @@ import { UsersService } from 'src/users/users.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
-import { ERRORS } from 'src/shared/enums/errors';
+import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
 
 @Injectable()
@@ -48,12 +48,12 @@ export class AuthService {
       user = await this.usersService.getUserByFieldName(authDto.phoneNumber, 'phoneNumber', true);
     } else {
       throw new UnauthorizedException({
-        message: ERRORS.INCORRECT_LOGIN_OR_PASSWORD,
+        message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD,
       });
     }
 
     if (!user) {
-      throw new UnauthorizedException({ message: ERRORS.INCORRECT_LOGIN_OR_PASSWORD });
+      throw new UnauthorizedException({ message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD });
     }
 
     if (!this.checkByRoleContext(user, authDto.context)) {
@@ -65,7 +65,7 @@ export class AuthService {
       user.password,
     );
     if (!isPasswordsEquals) {
-      throw new UnauthorizedException({ message: ERRORS.INCORRECT_LOGIN_OR_PASSWORD });
+      throw new UnauthorizedException({ message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD });
     }
 
     return user;
@@ -125,8 +125,6 @@ export class AuthService {
       throw new UnauthorizedException({ message: 'Invalid user' });
     }
 
-    console.log('----this.generateTokens(user): ', this.generateTokens(user));
-
     return this.generateTokens(user);
   }
 
@@ -137,7 +135,7 @@ export class AuthService {
 
       return user;
     } catch (e) {
-      throw new HttpException(ERRORS.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
+      throw new HttpException(ERROR_MESSAGES.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
   }
 
