@@ -5,7 +5,7 @@ import { RolesGuard } from '../auth/roles-auth.guard';
 import { Roles } from '../auth/roles-auth.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { GetOrderAnalyticsDTO } from './dto/analytics.dto';
-import { PeriodEnum } from 'src/shared/enums/period';
+import { PERIOD } from 'src/shared/enums/period';
 
 @ApiTags('analytics')
 @ApiBearerAuth()
@@ -17,7 +17,7 @@ export class AnalyticsController {
   @Get()
   @Roles('ADMIN')
   @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiQuery({ name: 'period', enum: PeriodEnum, required: false, description: 'Период анализа (day, week, month)' })
+  @ApiQuery({ name: 'period', enum: PERIOD, required: false, description: 'Период анализа (day, week, month)' })
   @ApiQuery({ name: 'days', type: Number, required: false, description: 'Количество дней для анализа' })
   @ApiQuery({ name: 'startDate', type: String, required: false, description: 'Дата начала анализа (YYYY-MM-DD)' })
   @ApiQuery({ name: 'endDate', type: String, required: false, description: 'Дата окончания анализа (YYYY-MM-DD)' })

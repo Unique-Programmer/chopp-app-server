@@ -1,11 +1,11 @@
 import { IsOptional, IsString, IsEnum, IsInt, Min, IsISO8601 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { PeriodEnum } from 'src/shared/enums/period';
+import { PERIOD } from 'src/shared/enums/period';
 
 export class GetOrderAnalyticsDTO {
   @IsOptional()
-  @IsEnum(PeriodEnum, { message: 'period должен быть day, week или month' })
-  period: PeriodEnum;
+  @IsEnum(PERIOD, { message: 'period должен быть day, week или month' })
+  period: PERIOD;
 
   @IsOptional()
   @IsInt({ message: 'days должен быть числом' })

@@ -1,26 +1,26 @@
-export interface IAnalyticsQueryResult {
+export type AnalyticsQueryResult = {
   date: string;
   orders: number;
   amount: number;
   minAmount: number;
   maxAmount: number;
   avgAmount: number;
-}
+};
 
-export interface IAmountAnalytics {
+export type AmountAnalytics = {
   value: string;
   currency: string;
-}
+};
 
-export interface ISummaryAnalytics {
-  totalAmount: IAmountAnalytics;
+export type SummaryAnalytics = {
+  totalAmount: AmountAnalytics;
   minOrderAmount: string;
   maxOrderAmount: string;
   averageOrderAmount: string;
-}
+};
 
-export interface IDailyAnalytics {
+export type DailyAnalytics = {
   date: string;
   ordersQuantity: number;
-  amount: IAmountAnalytics;
-}
+  amount: AmountAnalytics;
+};

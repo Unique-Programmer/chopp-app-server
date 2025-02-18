@@ -4,10 +4,10 @@ import { GetOrderAnalyticsDTO } from './dto/analytics.dto';
 import { Order } from '../order/order.model';
 import { Sequelize } from 'sequelize';
 import { Op } from 'sequelize';
-import { IAnalyticsQueryResult } from 'src/shared/types';
-import { PeriodEnum } from 'src/shared/enums/period';
+import { AnalyticsQueryResult } from 'src/shared/types';
+import { PERIOD } from 'src/shared/enums/period';
 import { OrderAnalyticsResponseDTO } from './dto/analytics-response.dto';
-import { IDailyAnalytics } from 'src/shared/types';
+import { DailyAnalytics } from 'src/shared/types';
 
 @Injectable()
 export class AnalyticsService {
@@ -28,13 +28,13 @@ export class AnalyticsService {
     } else if (period) {
       dateFrom = new Date();
       switch (period) {
-        case PeriodEnum.DAY:
+        case PERIOD.DAY:
           dateFrom.setDate(dateFrom.getDate() - 1);
           break;
-        case PeriodEnum.WEEK:
+        case PERIOD.WEEK:
           dateFrom.setDate(dateFrom.getDate() - 7);
           break;
-        case PeriodEnum.MONTH:
+        case PERIOD.MONTH:
           dateFrom.setDate(dateFrom.getDate() - 30);
           break;
       }
@@ -60,12 +60,12 @@ export class AnalyticsService {
       group: [Sequelize.fn('DATE', Sequelize.col('createdAt'))],
       order: [[Sequelize.fn('DATE', Sequelize.col('createdAt')), 'ASC']],
       raw: true,
-    })) as unknown as IAnalyticsQueryResult[];
+    })) as unknown as AnalyticsQueryResult[];
 
     const response = new OrderAnalyticsResponseDTO();
 
     response.items = analytics.map(
-      (item): IDailyAnalytics => ({
+      (item): DailyAnalytics => ({
         date: item.date,
         ordersQuantity: Number(item.orders),
         amount: {

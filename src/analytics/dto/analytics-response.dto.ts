@@ -1,6 +1,6 @@
-import { IDailyAnalytics, ISummaryAnalytics } from 'src/shared/types';
+import { DailyAnalytics, SummaryAnalytics } from 'src/shared/types';
 
 export class OrderAnalyticsResponseDTO {
-  items: IDailyAnalytics[];
-  summary: ISummaryAnalytics;
+  items: DailyAnalytics[];
+  summary: SummaryAnalytics;
 }
