@@ -81,7 +81,7 @@ export class PricingController {
     return settings;
   }
 
-  @Get('settings2')
+  @Get('settings')
   @ApiOperation({ summary: 'Get shop settings' })
   @ApiResponse({
     status: 200,
