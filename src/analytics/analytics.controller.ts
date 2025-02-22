@@ -6,6 +6,7 @@ import { Roles } from '../auth/roles-auth.decorator';
 import { ApiTags, ApiBearerAuth, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { GetOrderAnalyticsDTO } from './dto/analytics.dto';
 import { PERIOD } from 'src/shared/enums/period';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 @ApiTags('analytics')
 @ApiBearerAuth()
@@ -21,10 +22,11 @@ export class AnalyticsController {
   @ApiQuery({ name: 'days', type: Number, required: false, description: 'Количество дней для анализа' })
   @ApiQuery({ name: 'startDate', type: String, required: false, description: 'Дата начала анализа (YYYY-MM-DD)' })
   @ApiQuery({ name: 'endDate', type: String, required: false, description: 'Дата окончания анализа (YYYY-MM-DD)' })
+  @ApiQuery({ name: 'productsId', type: [Number], required: false, description: 'ID продуктов для аналитики' })
   @ApiOperation({ summary: 'Получение аналитики по заказам' })
   @ApiResponse({
     status: 200,
-    description: 'Успешное получение аналитики',
+    description: 'Успешное получение общей аналитики (если productsId пустой)',
     schema: {
       type: 'object',
       example: {
@@ -50,7 +52,32 @@ export class AnalyticsController {
       },
     },
   })
+  @ApiResponse({
+    status: 202,
+    description: 'Успешное получение аналитики по продуктам (если productsId не пустой)',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        example: {
+          orderDate: '2025-02-21',
+          product: {
+            price: {
+              value: '100.00',
+              currency: 'RUB',
+            },
+            title: 'Product 1',
+            quantity: 2,
+          },
+        },
+      },
+    },
+  })
   async getOrderAnalytics(@Query() query: GetOrderAnalyticsDTO) {
+    if (query.productsId) {
+      const response = this.analiticService.getProductAnalytics(query);
+      throw new HttpException(response, HttpStatus.ACCEPTED);
+    }
     return this.analiticService.getOrderAnalytics(query);
   }
 }
