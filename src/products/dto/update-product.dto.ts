@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsString, Min, IsArray, IsInt, IsBoolean } from 'class-validator';
-import { ORDER_STATE } from 'src/shared/enums';
+import { PRODUCT_STATE } from 'src/shared/enums';
 
 export class UpdateProductDto {
   @ApiProperty({
@@ -37,7 +37,7 @@ export class UpdateProductDto {
       example: 'hidden',
     })
     @IsString()
-    state: ORDER_STATE;
+    state: PRODUCT_STATE;
 
   @ApiProperty({
     description: 'Product category',

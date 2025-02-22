@@ -6,10 +6,11 @@ import { Product } from './product.model';
 import { FilesModule } from 'src/files/files.module';
 import { FileModel } from 'src/files/file.model';
 import { AuthModule } from 'src/auth/auth.module';
+import { ProductFile } from './product-file.model';
 
 @Module({
   imports: [
-    SequelizeModule.forFeature([Product, FileModel]),
+    SequelizeModule.forFeature([Product, ProductFile]),
     forwardRef(() => FilesModule),
     forwardRef(() => AuthModule),
   ],

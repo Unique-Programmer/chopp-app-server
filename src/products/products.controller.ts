@@ -12,15 +12,16 @@ import {
   HttpStatus,
   UseGuards,
   Patch,
+  Delete,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilesService } from '../files/files.service';
 import { ProductService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
-import { ORDER_STATE } from 'src/shared/enums';
+import { PRODUCT_STATE } from 'src/shared/enums';
 
 @ApiTags('products')
 @Controller('products')
@@ -108,7 +109,7 @@ export class ProductsController {
     @Query('search') search?: string,
     @Query('sort') sort?: string,
     @Query('order') order: 'ASC' | 'DESC' = 'ASC',
-    @Query('state') state?: ORDER_STATE | ORDER_STATE[], // Массив состояний
+    @Query('state') state?: PRODUCT_STATE | PRODUCT_STATE[], // Массив состояний
   ) {
     const stateArray = Array.isArray(state) ? state : state ? [state] : undefined;
 
@@ -126,9 +127,15 @@ export class ProductsController {
   @Patch(':id/state')
   @ApiBody({
     description: 'Update product visibility',
-    schema: { type: 'object', properties: { state: { type: typeof ORDER_STATE } } },
+    schema: { type: 'object', properties: { state: { type: typeof PRODUCT_STATE } } },
   })
-  async updateProductState(@Param('id') id: number, @Body('state') state: ORDER_STATE) {
+  async updateProductState(@Param('id') id: number, @Body('state') state: PRODUCT_STATE) {
     return this.productService.updateProductState(id, state);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Удаление товара', description: 'Удаляет товар по ID вместе со связанными файлами.' })
+  async deleteProduct(@Param('id') id: number) {
+    return this.productService.deleteProduct(id);
   }
 }

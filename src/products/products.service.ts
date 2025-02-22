@@ -6,13 +6,14 @@ import { Category } from 'src/categories/category.model';
 import { Op } from 'sequelize';
 import { FileModel } from 'src/files/file.model';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ORDER_STATE } from 'src/shared/enums';
+import { ApiResponse, PRODUCT_STATE } from 'src/shared/enums';
+import { ProductFile } from './product-file.model';
 
 @Injectable()
 export class ProductService {
   constructor(
     @InjectModel(Product) private readonly productRepository: typeof Product,
-    @InjectModel(FileModel) private readonly fileRepository: typeof FileModel,
+    @InjectModel(ProductFile) private readonly productFileRepository: typeof ProductFile,
   ) {}
 
   async createProduct(dto: CreateProductDto): Promise<Product> {
@@ -84,7 +85,7 @@ export class ProductService {
     search?: string,
     sort: string = 'id',
     order: string = 'ASC',
-    state?: ORDER_STATE[], // Массив состояний
+    state?: PRODUCT_STATE[], // Массив состояний
   ) {
     const offset = (pageNumber - 1) * limit;
 
@@ -122,7 +123,7 @@ export class ProductService {
     };
   }
 
-  async updateProductState(productId: number, state: ORDER_STATE): Promise<Product> {
+  async updateProductState(productId: number, state: PRODUCT_STATE): Promise<Product> {
     const product = await this.productRepository.findByPk(productId);
 
     if (!product) {
@@ -131,5 +132,18 @@ export class ProductService {
 
     await product.update({ state });
     return this.getProductById(productId);
+  }
+
+  async deleteProduct(productId: number): Promise<ApiResponse> {
+    const product = await this.productRepository.findByPk(productId);
+
+    if (!product) {
+      throw new HttpException('Product not found', HttpStatus.NOT_FOUND);
+    }
+
+    await this.productFileRepository.destroy({ where: { productId } });
+    await this.productRepository.destroy({ where: { id: productId } });
+
+    return { status: HttpStatus.OK, message: 'ok' };
   }
 }
