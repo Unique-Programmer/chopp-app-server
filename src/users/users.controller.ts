@@ -23,6 +23,7 @@ import { ValidationPipe } from 'src/pipes/validation.pipe';
 import { AuthService } from 'src/auth/auth.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { ERROR_MESSAGES } from 'src/shared/enums';
 
 @ApiTags('users')
 @Controller('users')
@@ -52,10 +53,7 @@ export class UsersController {
     );
 
     if (!isAuthenticated) {
-      throw new HttpException(
-        'Superadmin authentication failed',
-        HttpStatus.FORBIDDEN,
-      );
+      throw new HttpException('Superadmin authentication failed', HttpStatus.FORBIDDEN);
     }
 
     return this.usersService.createAdmin({
@@ -96,10 +94,7 @@ export class UsersController {
     const authHeader = headers.authorization;
     const accessToken = authHeader.split(' ')[1];
 
-    const payload = this.authService.verifyToken(
-      accessToken,
-      process.env.JWT_ACCESS_SECRET_HEX,
-    );
+    const payload = this.authService.verifyToken(accessToken, process.env.JWT_ACCESS_SECRET_HEX);
 
     return this.usersService.getAllUsers(page, limit, search, sort, order, isRequesterIncluded, payload.id);
   }
@@ -153,7 +148,7 @@ export class UsersController {
     const user = await this.usersService.getUserByFieldName(params.id, 'id');
 
     if (!user?.id) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException(ERROR_MESSAGES.USER_NOT_FOUND, HttpStatus.BAD_REQUEST);
     }
 
     return user;
