@@ -65,7 +65,12 @@ export class OrderService {
     }
   }
 
-  async createOrder({ userId, returnUrl, comment, address }: { userId: number } & CreateOrderDTO): Promise<CreatePaymentResponseDto> {
+  async createOrder({
+    userId,
+    returnUrl,
+    comment,
+    address,
+  }: { userId: number } & CreateOrderDTO): Promise<CreatePaymentResponseDto> {
     const transaction = await this.orderModel.sequelize.transaction();
 
     try {
@@ -193,17 +198,35 @@ export class OrderService {
     page = 1,
     limit = 10,
     search,
+    startDate,
+    endDate,
     sort = 'createdAt',
     order = 'ASC',
     userId,
-  }: PaginationRequestQuery & { userId?: number }): Promise<PaginationResponse<Order>> {
+  }: PaginationRequestQuery & { userId?: number; startDate?: string; endDate?: string }): Promise<
+    PaginationResponse<Order>
+  > {
     const offset = (page - 1) * limit;
 
-    const whereCondition: any = search
-      ? {
-          [Op.or]: [{ title: { [Op.iLike]: `%${search}%` } }, { description: { [Op.iLike]: `%${search}%` } }],
-        }
-      : {};
+    const whereCondition: any = {};
+
+    // Фильтр по ID заказа (если в search пришло число)
+    if (search) {
+      if (!isNaN(Number(search))) {
+        whereCondition.id = Number(search);
+      }
+    }
+
+    // Фильтр по диапазону дат (если обе даты переданы)
+    if (startDate || endDate) {
+      whereCondition.createdAt = {};
+      if (startDate) {
+        whereCondition.createdAt[Op.gte] = new Date(startDate);
+      }
+      if (endDate) {
+        whereCondition.createdAt[Op.lte] = new Date(endDate);
+      }
+    }
 
     if (userId) {
       whereCondition.userId = userId;

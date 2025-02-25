@@ -91,8 +91,22 @@ export class OrderController {
     name: 'search',
     type: 'string',
     required: false,
-    description: 'Поиск по деталям заказа',
-    example: '',
+    description: 'Поиск по ID заказа',
+    example: '12345',
+  })
+  @ApiQuery({
+    name: 'startDate',
+    type: 'string',
+    required: false,
+    description: 'Фильтр по дате создания заказа (начальная дата, формат YYYY-MM-DD)',
+    example: '2024-03-01',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    type: 'string',
+    required: false,
+    description: 'Фильтр по дате создания заказа (конечная дата, формат YYYY-MM-DD)',
+    example: '2024-03-15',
   })
   @ApiQuery({
     name: 'sort',
@@ -115,27 +129,33 @@ export class OrderController {
     type: [GetOrdersResponseDto],
   })
   async getAllOrders(
+    @Req() req: any, // Теперь первый аргумент
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
-    @Query('search') search: string = '',
+    @Query('search') search?: string,
+    @Query('startDate') startDate?: string,
+    @Query('endDate') endDate?: string,
     @Query('sort') sort: string = 'createdAt',
     @Query('order') order: 'ASC' | 'DESC' = 'DESC',
-    @Req() req: any,
   ): Promise<PaginationResponse<Order>> {
     const userId = req.user.id;
     const isAdmin = req.user.roles.some((role: any) =>
       typeof role === 'string' ? role === 'ADMIN' : role.value === 'ADMIN',
     );
-
+  
     return this.orderService.findAllOrders({
       page,
       limit,
       search,
+      startDate,
+      endDate,
       sort,
       order,
-      userId: isAdmin ? undefined : userId, // Если админ, возвращаем все заказы, иначе только для текущего пользователя
+      userId: isAdmin ? undefined : userId,
     });
   }
+  
+
 
   @Get(':id')
   @ApiOperation({ summary: 'Получить заказ по ID' })
