@@ -41,7 +41,7 @@ export class GetOrdersResponseDto {
   totalPages: number;
 
   @ApiProperty({ example: 1, description: 'Current page number' })
-  currentPage: number;
+  pageNumber: number;
 
   @ApiProperty({ example: 10, description: 'Number of items per page' })
   limit: number;
