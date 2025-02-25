@@ -5,43 +5,30 @@ import { Order } from '../order/order.model';
 import { Sequelize } from 'sequelize';
 import { Op } from 'sequelize';
 import { AnalyticsQueryResult } from 'src/shared/types';
-import { PERIOD } from 'src/shared/enums/period';
 import { OrderAnalyticsResponseDTO } from './dto/analytics-response.dto';
 import { DailyAnalytics } from 'src/shared/types';
+import { Product } from '../products/product.model';
+import { getCurrentIntervals } from '../shared/utils/analytic-utils';
+import { OrderStats } from '../order/order-stats.model';
+import { ProductAnalyticsResponse } from 'src/shared/types/analytics';
 
 @Injectable()
 export class AnalyticsService {
-  constructor(@InjectModel(Order) private orderModel: typeof Order) {}
+  constructor(
+    @InjectModel(Order) private orderModel: typeof Order,
+    @InjectModel(Product) private productModel: typeof Product,
+    @InjectModel(OrderStats) private orderStatsModel: typeof OrderStats,
+  ) {}
 
   async getOrderAnalytics(query: GetOrderAnalyticsDTO) {
     const { period, days, startDate, endDate } = query;
 
-    let dateFrom: Date;
-    let dateTo: Date = new Date();
-
-    if (startDate && endDate) {
-      dateFrom = new Date(startDate);
-      dateTo = new Date(endDate);
-    } else if (days) {
-      dateFrom = new Date();
-      dateFrom.setDate(dateTo.getDate() - days);
-    } else if (period) {
-      dateFrom = new Date();
-      switch (period) {
-        case PERIOD.DAY:
-          dateFrom.setDate(dateFrom.getDate() - 1);
-          break;
-        case PERIOD.WEEK:
-          dateFrom.setDate(dateFrom.getDate() - 7);
-          break;
-        case PERIOD.MONTH:
-          dateFrom.setDate(dateFrom.getDate() - 30);
-          break;
-      }
-    } else {
-      dateFrom = new Date();
-      dateFrom.setDate(dateTo.getDate() - 1);
-    }
+    const [dateFrom, dateTo] = getCurrentIntervals(
+      startDate ? new Date(startDate) : undefined,
+      endDate ? new Date(endDate) : undefined,
+      days,
+      period,
+    );
 
     const analytics = (await this.orderModel.findAll({
       attributes: [
@@ -76,7 +63,7 @@ export class AnalyticsService {
     );
 
     const totalAmount = analytics.reduce((acc, item) => acc + (item.amount || 0), 0);
-    const totalOrders = analytics.reduce((acc, item) => acc + item.orders, 0) || 1;
+    const totalOrders = response.items.reduce((acc, item) => acc + item.ordersQuantity, 0) || 1;
     const minOrderAmount = analytics.length > 0 ? Math.min(...analytics.map((item) => item.minAmount)) : 0;
     const maxOrderAmount = analytics.length > 0 ? Math.max(...analytics.map((item) => item.maxAmount)) : 0;
 
@@ -89,6 +76,52 @@ export class AnalyticsService {
       maxOrderAmount: maxOrderAmount.toFixed(2),
       averageOrderAmount: Math.round(totalAmount / totalOrders).toFixed(2),
     };
+
+    return response;
+  }
+
+  async getProductAnalytics(query: GetOrderAnalyticsDTO) {
+    const { period, days, startDate, endDate, productsId } = query;
+
+    const [dateFrom, dateTo] = getCurrentIntervals(
+      startDate ? new Date(startDate) : undefined,
+      endDate ? new Date(endDate) : undefined,
+      days,
+      period,
+    );
+
+    const productsName = await this.productModel.findAll({
+      where: {
+        id: {
+          [Op.in]: productsId,
+        },
+      },
+      attributes: ['title'],
+      raw: true,
+    });
+
+    const analytics = await this.orderStatsModel.findAll({
+      where: {
+        orderDate: {
+          [Op.between]: [dateFrom, dateTo],
+        },
+        ['product.title']: {
+          [Op.in]: productsName.map((product) => product.title),
+        },
+      },
+    });
+
+    const response: ProductAnalyticsResponse[] = analytics.map((item) => ({
+      orderDate: item.orderDate,
+      product: {
+        price: {
+          value: item.product.price.value,
+          currency: item.product.price.currency,
+        },
+        title: item.product.title,
+        quantity: item.product.quantity,
+      },
+    }));
 
     return response;
   }

@@ -32,6 +32,7 @@ import { PaymentsModule } from './payment/payments.module';
 import { OrderItem } from './order/order-item.model';
 import { Subscription } from './payment/subscription.model';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { OrderStats } from './order/order-stats.model';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
         Order,
         OrderItem,
         Subscription,
+        OrderStats,
       ],
       autoLoadModels: true,
     }),
