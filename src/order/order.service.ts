@@ -104,9 +104,12 @@ export class OrderService {
       });
 
       for (const item of items) {
+        const orderDate = order.createdAt.toISOString().split('T')[0];
+
         const existingStats = await this.orderStatsModel.findOne({
           where: {
             ['product.title']: item.product.title,
+            ['order_date']: orderDate,
           },
         });
 
@@ -125,13 +128,13 @@ export class OrderService {
             {
               where: {
                 ['product.title']: item.product.title,
-                order_date: order.createdAt.toISOString().split('T')[0],
+                order_date: orderDate,
               },
             },
           );
         } else {
           await this.orderStatsModel.create({
-            orderDate: order.createdAt,
+            orderDate: orderDate,
             product: {
               price: {
                 value: item.price.toFixed(2),

@@ -30,5 +30,7 @@ export function getCurrentIntervals(startDate: Date, endDate: Date, days: number
     dateFrom = new Date();
     dateFrom.setDate(dateTo.getDate() - 1);
   }
+  dateFrom.setHours(0, 0, 0, 0);
+  dateTo.setHours(23, 59, 59, 999);
   return [dateFrom, dateTo];
 }

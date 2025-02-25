@@ -75,7 +75,7 @@ export class AnalyticsController {
   })
   async getOrderAnalytics(@Query() query: GetOrderAnalyticsDTO) {
     if (query.productsId) {
-      const response = this.analiticService.getProductAnalytics(query);
+      const response = await this.analiticService.getProductAnalytics(query);
       throw new HttpException(response, HttpStatus.ACCEPTED);
     }
     return this.analiticService.getOrderAnalytics(query);

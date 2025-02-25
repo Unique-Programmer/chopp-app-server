@@ -63,7 +63,7 @@ export class AnalyticsService {
     );
 
     const totalAmount = analytics.reduce((acc, item) => acc + (item.amount || 0), 0);
-    const totalOrders = analytics.reduce((acc, item) => acc + item.orders, 0) || 1;
+    const totalOrders = response.items.reduce((acc, item) => acc + item.ordersQuantity, 0) || 1;
     const minOrderAmount = analytics.length > 0 ? Math.min(...analytics.map((item) => item.minAmount)) : 0;
     const maxOrderAmount = analytics.length > 0 ? Math.max(...analytics.map((item) => item.maxAmount)) : 0;
 
