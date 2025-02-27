@@ -17,6 +17,7 @@ import { FileModel } from 'src/files/file.model';
 import { NotificationService } from 'src/websockets/notification/notification.service';
 import { User } from 'src/users/users.model';
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
+import { OrderStats } from './order-stats.model';
 
 @Injectable()
 export class OrderService {
@@ -25,6 +26,7 @@ export class OrderService {
     @InjectModel(OrderItem) private readonly orderItemModel: typeof OrderItem,
     @InjectModel(ShoppingCart) private readonly shoppingCartModel: typeof ShoppingCart,
     @InjectModel(User) private readonly userModel: typeof User,
+    @InjectModel(OrderStats) private readonly orderStatsModel: typeof OrderStats,
     @InjectModel(ShoppingCartItem) private readonly shoppingCartItemModel: typeof ShoppingCartItem,
     private readonly paymentService: PaymentsService,
     private readonly notificationService: NotificationService,
@@ -100,6 +102,50 @@ export class OrderService {
         include: [{ model: Product }],
         transaction,
       });
+
+      for (const item of items) {
+        const orderDate = order.createdAt.toISOString().split('T')[0];
+
+        const existingStats = await this.orderStatsModel.findOne({
+          where: {
+            ['product.title']: item.product.title,
+            ['order_date']: orderDate,
+          },
+        });
+
+        if (existingStats) {
+          await this.orderStatsModel.update(
+            {
+              product: {
+                price: {
+                  value: (Number(existingStats.product.price.value) + Number(item.price)).toFixed(2),
+                  currency: 'RUB',
+                },
+                title: existingStats.product.title,
+                quantity: existingStats.product.quantity + item.quantity,
+              },
+            },
+            {
+              where: {
+                ['product.title']: item.product.title,
+                order_date: orderDate,
+              },
+            },
+          );
+        } else {
+          await this.orderStatsModel.create({
+            orderDate: orderDate,
+            product: {
+              price: {
+                value: item.price.toFixed(2),
+                currency: 'RUB',
+              },
+              title: item.product.title,
+              quantity: item.quantity,
+            },
+          });
+        }
+      }
 
       const paymentResult = await this.paymentService.createPayment({
         amount: order.totalPrice.toString(),

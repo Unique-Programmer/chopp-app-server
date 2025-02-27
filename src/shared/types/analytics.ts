@@ -24,3 +24,15 @@ export type DailyAnalytics = {
   ordersQuantity: number;
   amount: AmountAnalytics;
 };
+
+export type ProductAnalyticsResponse = {
+  orderDate: string;
+  product: {
+    price: {
+      value: string;
+      currency: string;
+    };
+    title: string;
+    quantity: number;
+  };
+};

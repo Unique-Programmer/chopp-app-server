@@ -1,4 +1,4 @@
-import { IsOptional, IsString, IsEnum, IsInt, Min, IsISO8601 } from 'class-validator';
+import { IsOptional, IsEnum, IsInt, Min, IsISO8601 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { PERIOD } from 'src/shared/enums/period';
 
@@ -22,4 +22,6 @@ export class GetOrderAnalyticsDTO {
   @IsISO8601({}, { message: 'endDate должен быть в формате ISO8601 (YYYY-MM-DD)' })
   @Transform(({ value }) => new Date(value).toISOString())
   endDate?: string;
+
+  productsId: number[];
 }
