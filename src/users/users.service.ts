@@ -171,6 +171,7 @@ export class UsersService {
         limit: +limit,
         offset,
         order: sort ? [[sortParam, order.toUpperCase()]] : [],
+        distinct: true,
         include: { all: true },
         attributes: { exclude: ['password'] },
       });

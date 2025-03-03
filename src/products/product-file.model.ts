@@ -27,9 +27,10 @@ export class ProductFile extends Model<ProductFile> {
   @ForeignKey(() => Product)
   @Column({
     type: DataType.INTEGER,
-    allowNull: false,
+    allowNull: true, // Разрешаем NULL
+    onDelete: 'SET NULL', // Устанавливаем NULL при удалении продукта
   })
-  productId: number;
+  productId: number | null;
 
   @ForeignKey(() => FileModel)
   @Column({

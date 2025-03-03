@@ -79,11 +79,11 @@ export class ShoppingCartService implements OnModuleInit {
   
     const items = plainCart.items.map((item) => ({
       product: {
-        ...item.product,
-        images: item.product.images, // Добавляем изображения
+        ...item?.product,
+        images: item.product?.images, // Добавляем изображения
       },
       quantity: item.quantity,
-      totalPrice: item.quantity * item.product.price,
+      totalPrice: item.quantity * item.product?.price,
     }));
   
     return { items, totalPrice: plainCart.totalPrice, quantity: plainCart.quantity };
@@ -147,8 +147,8 @@ export class ShoppingCartService implements OnModuleInit {
   
         detailedItems.push({
           product: {
-            ...product.toJSON(),
-            images: product.images,
+            ...product?.toJSON(),
+            images: product?.images,
           },
           quantity: newItem.quantity,
           totalPrice: itemTotalPrice,

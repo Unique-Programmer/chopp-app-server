@@ -110,6 +110,7 @@ export class ProductService {
       limit,
       offset,
       order: [[sort, order]],
+      distinct: true,
       include: [{ model: FileModel, as: 'images' }, { model: Category }],
       attributes: { exclude: ['categoryId'] },
     });

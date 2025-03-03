@@ -23,8 +23,10 @@ export class ShoppingCartItem extends Model<ShoppingCartItem> {
   @ForeignKey(() => Product)
   @Column({
     type: DataType.INTEGER,
+    allowNull: true, // Разрешаем NULL
+    onDelete: 'SET NULL', // Устанавливаем NULL при удалении продукта
   })
-  productId: number;
+  productId: number | null;
 
   @BelongsTo(() => Product)
   product: Product;

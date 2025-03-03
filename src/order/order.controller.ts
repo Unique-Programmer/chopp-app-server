@@ -10,7 +10,8 @@ import { CreatePaymentResponseDto } from 'src/payment/dto/create-payment-respons
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
 import { Roles } from 'src/auth/roles-auth.decorator';
 import { RolesGuard } from 'src/auth/roles-auth.guard';
-import { CreateOrderDTO} from './dto/create-order.dto'
+import { CreateOrderDTO } from './dto/create-order.dto';
+import { ORDER_STATUS } from 'src/shared/enums';
 
 @ApiTags('orders')
 @Controller('orders')
@@ -109,6 +110,13 @@ export class OrderController {
     example: '2024-03-15',
   })
   @ApiQuery({
+    name: 'status',
+    type: 'string',
+    required: false,
+    description: 'Список статусов заказов, через запятую',
+    example: 'AWAITING_PAYMENT,DELIVERED',
+  })
+  @ApiQuery({
     name: 'sort',
     type: 'string',
     required: false,
@@ -129,12 +137,13 @@ export class OrderController {
     type: [GetOrdersResponseDto],
   })
   async getAllOrders(
-    @Req() req: any, // Теперь первый аргумент
+    @Req() req: any, // Первый аргумент
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') search?: string,
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
+    @Query('status') status?: ORDER_STATUS,
     @Query('sort') sort: string = 'createdAt',
     @Query('order') order: 'ASC' | 'DESC' = 'DESC',
   ): Promise<PaginationResponse<Order>> {
@@ -142,20 +151,19 @@ export class OrderController {
     const isAdmin = req.user.roles.some((role: any) =>
       typeof role === 'string' ? role === 'ADMIN' : role.value === 'ADMIN',
     );
-  
+
     return this.orderService.findAllOrders({
       page,
       limit,
       search,
       startDate,
       endDate,
+      status: status ? status.split(',') as ORDER_STATUS[] : undefined, // Преобразуем строку в массив статусов
       sort,
       order,
       userId: isAdmin ? undefined : userId,
     });
   }
-  
-
 
   @Get(':id')
   @ApiOperation({ summary: 'Получить заказ по ID' })

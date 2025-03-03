@@ -20,8 +20,12 @@ export class OrderItem extends Model<OrderItem> {
   order: Order;
 
   @ForeignKey(() => Product)
-  @Column({ type: DataType.INTEGER })
-  productId: number;
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: true, // Разрешаем NULL
+    onDelete: 'SET NULL', // Устанавливаем NULL при удалении продукта
+  })
+  productId: number | null;
 
   @BelongsTo(() => Product)
   product: Product;
