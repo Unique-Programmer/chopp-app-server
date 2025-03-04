@@ -33,6 +33,8 @@ import { OrderItem } from './order/order-item.model';
 import { Subscription } from './payment/subscription.model';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { OrderStats } from './order/order-stats.model';
+import { ScheduleModule } from '@nestjs/schedule';
+import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
 
 @Module({
   imports: [
@@ -85,6 +87,8 @@ import { OrderStats } from './order/order-stats.model';
     OrderModule,
     PaymentsModule,
     AnalyticsModule,
+    FileCleanupModule,
+    ScheduleModule.forRoot(),
   ],
   controllers: [],
   providers: [],
