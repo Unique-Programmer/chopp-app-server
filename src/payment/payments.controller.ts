@@ -122,6 +122,12 @@ export class PaymentsController {
     type: String,
     description: 'Фильтр по статусу платежа',
   })
+  @ApiQuery({
+    name: 'status',
+    required: false,
+    type: String,
+    description: 'Поиск по номеру заказа или транзакции',
+  })
   @Roles('ADMIN')
   @UseGuards(RolesGuard)
   async getPayments(
@@ -139,12 +145,12 @@ export class PaymentsController {
       'captured_at.lt'?: string;
       payment_method?: string;
       status?: string;
+      search?: string;
     },
   ): Promise<any> {
-    console.log('--queryParams; ', queryParams)
+    console.log('--queryParams; ', queryParams);
     return this.paymentService.getPayments(queryParams);
   }
-
 
   @Get('/:paymentId')
   @ApiOperation({

@@ -184,8 +184,31 @@ export class PaymentsService {
   }
 
   async getPayments(params: Record<string, any>): Promise<any> {
+    const { search, ...yooKassaParams } = params;
     const headers = this.createHeaders();
-    return this.makeHttpRequest(`${YOOKASSA_URL}/payments`, 'GET', null, headers, params);
+    const response = (await this.makeHttpRequest(
+      `${YOOKASSA_URL}/payments`,
+      'GET',
+      null,
+      headers,
+      yooKassaParams,
+    )) as any;
+
+    if (!search) {
+      return response;
+    }
+
+    const filteredPayments = response.items.filter((payment) => {
+      const matchesTransactionId = payment.id.toLowerCase() === search.toLowerCase();
+      const matchesOrderId = payment.metadata?.order_id?.toLowerCase() === search.toLowerCase();
+
+      return matchesTransactionId || matchesOrderId;
+    });
+
+    return {
+      ...response,
+      items: filteredPayments,
+    };
   }
 
   async getPaymentById(paymentId: string): Promise<any> {
