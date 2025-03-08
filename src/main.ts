@@ -25,6 +25,16 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+
+  // Добавляем `servers`, чтобы Swagger отправлял запросы с `/api/`
+  document.servers = [
+    {
+      url: '/api', // Теперь все запросы Swagger будут через /api/
+      description: 'Base API URL with Nginx proxy',
+    },
+  ];
+
+
   SwaggerModule.setup(`/docs`, app, document);
 
   await app.listen(PORT, () =>

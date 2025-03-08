@@ -43,7 +43,7 @@ export class FilesService {
 
       fileRecord = await this.fileModel.create({
         hash: fileHash,
-        path: filePath,
+        path: fileName,
         originalName: file.originalname,
         size: file.size,
       });
