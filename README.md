@@ -32,4 +32,4 @@ $ docker-compose up
 
 ## API Docs
 
-Swagger: http://localhost:[env.PORT]/api/docs
+Swagger: http://localhost:[env.PORT]/docs
