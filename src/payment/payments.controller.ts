@@ -11,6 +11,7 @@ import { RolesGuard } from 'src/auth/roles-auth.guard';
 import { CreatePaymentResponseDto } from './dto/create-payment-response.dto';
 import { CapturePaymentDto } from './dto/capture-payment.dto';
 import { CreatePaymentDto } from './dto/create-payment.dto';
+import { PAYMENT_STATUS } from 'src/shared/enums';
 
 @ApiTags('payments')
 @Controller('payments')
@@ -141,10 +142,8 @@ export class PaymentsController {
       status?: string;
     },
   ): Promise<any> {
-    console.log('--queryParams; ', queryParams)
     return this.paymentService.getPayments(queryParams);
   }
-
 
   @Get('/:paymentId')
   @ApiOperation({

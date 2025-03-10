@@ -13,6 +13,7 @@ import { YooKassaWebhookService } from './yookassa-webhook.service';
 import { NotificationService } from 'src/websockets/notification/notification.service';
 import { PAYMENT_STATUS, WS_MESSAGE_TYPE } from 'src/shared/enums/';
 import { User } from 'src/users/users.model';
+import qs from 'qs';
 
 @Injectable()
 export class PaymentsService {
@@ -70,6 +71,17 @@ export class PaymentsService {
     headers?: Record<string, string>,
     params?: Record<string, any>, // Новый аргумент для параметров запроса
   ): Promise<T> {
+
+    const paramsNormalized = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+      if(Array.isArray(value)) {
+        value.forEach((s) => paramsNormalized.append(key, s));
+      } else {
+        paramsNormalized.append(key, value)
+      }
+    })
+
     try {
       const response = await this.httpService
         .request<T>({
@@ -77,7 +89,7 @@ export class PaymentsService {
           method,
           data,
           headers,
-          params, // Передаем параметры в запрос
+          params: paramsNormalized
         })
         .toPromise();
 

@@ -26,13 +26,13 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
 
-  // Добавляем `servers`, чтобы Swagger отправлял запросы с `/api/`
-  document.servers = [
-    {
-      url: '/api', // Теперь все запросы Swagger будут через /api/
-      description: 'Base API URL with Nginx proxy',
-    },
-  ];
+  // // Добавляем `servers`, чтобы Swagger отправлял запросы с `/api/`
+  // document.servers = [
+  //   {
+  //     url: '/api', // Теперь все запросы Swagger будут через /api/
+  //     description: 'Base API URL with Nginx proxy',
+  //   },
+  // ];
 
 
   SwaggerModule.setup(`/docs`, app, document);

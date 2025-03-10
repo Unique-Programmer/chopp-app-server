@@ -25,8 +25,6 @@ import { PRODUCT_STATE } from 'src/shared/enums';
 
 @ApiTags('products')
 @Controller('products')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class ProductsController {
   constructor(
     private readonly productService: ProductService,
@@ -40,6 +38,8 @@ export class ProductsController {
     type: CreateProductDto,
   })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async createProduct(
     @UploadedFiles() files: { images?: Express.Multer.File[] },
     @Body() productData: CreateProductDto,
@@ -59,6 +59,8 @@ export class ProductsController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ description: 'Update product', type: UpdateProductDto })
   @UseInterceptors(FileFieldsInterceptor([{ name: 'images', maxCount: 5 }]))
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async updateProduct(
     @UploadedFiles() files: { images?: Express.Multer.File[] },
     @Body() productData: UpdateProductDto,
@@ -129,12 +131,16 @@ export class ProductsController {
     description: 'Update product visibility',
     schema: { type: 'object', properties: { state: { type: typeof PRODUCT_STATE } } },
   })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async updateProductState(@Param('id') id: number, @Body('state') state: PRODUCT_STATE) {
     return this.productService.updateProductState(id, state);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Удаление товара', description: 'Удаляет товар по ID вместе со связанными файлами.' })
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   async deleteProduct(@Param('id') id: number) {
     return this.productService.deleteProduct(id);
   }
