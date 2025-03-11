@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { expireParseByHours } from 'src/shared/utils';
-import { AuthDto, RefreshDto } from './dto/auth.dto';
+import { AuthDto, LoginDto, RefreshDto, VerifyCodeDto } from './dto/auth.dto';
 import { RolesGuard } from 'src/auth/roles-auth.guard';
 import { Roles } from 'src/auth/roles-auth.decorator';
 import { User } from 'src/users/users.model';
@@ -67,5 +67,26 @@ export class AuthController {
     });
 
     return data;
+  }
+
+
+
+
+  @Post('/loginByCode')
+  @ApiOperation({ summary: 'Request a verification code' })
+  async loginByCode(@Body() { phoneNumber }: LoginDto) {
+    return this.authService.loginByCode(phoneNumber);
+  }
+
+  @Post('/verify')
+  @ApiOperation({ summary: 'Verify the code and get tokens' })
+  async verifyCode(@Body() { phoneNumber, code }: VerifyCodeDto) {
+    return this.authService.verifyCode(phoneNumber, code);
+  }
+
+  @Post('/resend-code')
+  @ApiOperation({ summary: 'Resend verification code' })
+  async resendCode(@Body() { phoneNumber }: LoginDto) {
+    return this.authService.resendCode(phoneNumber);
   }
 }

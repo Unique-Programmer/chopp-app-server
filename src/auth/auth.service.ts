@@ -31,6 +31,76 @@ export class AuthService {
     };
   }
 
+
+  private generateCode(): string {
+    return Math.floor(1000 + Math.random() * 9000).toString(); // 4-значный код
+  }
+
+  async loginByCode(phoneNumber: string) {
+    let user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
+
+    if (!user) {
+      user = await this.usersService.createUser({ phoneNumber, isRegistered: false });
+    }
+
+    const code = this.generateCode();
+    const hashedCode = await bcrypt.hash(code, 5);
+
+    await user.update({
+      verificationCode: hashedCode,
+      verificationExpires: new Date(Date.now() + 5 * 60 * 1000), // Действителен 5 минут
+      verificationAttempts: 0, // Сбрасываем попытки
+    });
+
+    console.log(`🔹 Your verification code: ${code}`); // Заглушка вместо SMS
+
+    return { message: `🔹 Your verification code: ${code}` };
+  }
+
+  async verifyCode(phoneNumber: string, code: string) {
+    const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
+
+    if (!user || !user.verificationCode) {
+      throw new UnauthorizedException('Invalid phone number or verification code.');
+    }
+
+    if (user.verificationAttempts >= 5) {
+      throw new UnauthorizedException('Too many failed attempts. Please request a new code.');
+    }
+
+    if (new Date() > user.verificationExpires) {
+      throw new UnauthorizedException('Verification code expired. Please request a new one.');
+    }
+
+    const isCodeValid = await bcrypt.compare(code, user.verificationCode);
+    if (!isCodeValid) {
+      await user.update({ verificationAttempts: user.verificationAttempts + 1 });
+      throw new UnauthorizedException('Invalid verification code.');
+    }
+
+    await user.update({
+      verificationCode: null,
+      verificationAttempts: 0,
+      isRegistered: true,
+    });
+
+    return this.generateTokens(user);
+  }
+
+  async resendCode(phoneNumber: string) {
+    const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
+    if (!user) throw new UnauthorizedException('Phone number not found');
+
+    if (user.verificationExpires && new Date() < user.verificationExpires) {
+      throw new HttpException('Wait before requesting a new code', HttpStatus.TOO_MANY_REQUESTS);
+    }
+
+    return this.loginByCode(phoneNumber);
+  }
+
+
+
+
   private checkByRoleContext(user: User, context: USER_ROLE): boolean {
     const [role] = user.roles;
 

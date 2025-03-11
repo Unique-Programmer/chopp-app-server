@@ -10,8 +10,6 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags('categories')
 @Controller('categories')
-@UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
 export class CategoriesController {
   constructor(private categoriesService: CategoriesService) {}
 
@@ -34,7 +32,6 @@ export class CategoriesController {
     description: 'List of categories',
     type: [Category],
   })
-  @UseGuards(JwtAuthGuard)
   getAllCategories(): Promise<Category[]> {
     return this.categoriesService.getAllCategories();
   }

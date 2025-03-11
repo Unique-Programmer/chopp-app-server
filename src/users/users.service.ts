@@ -45,6 +45,7 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto) {
+    console.log('----user 2: ', dto)
     const user = await this.userRepository.create(dto);
     const role = await this.roleService.getRoleByValue('USER');
     // role creation after user is created

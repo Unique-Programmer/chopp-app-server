@@ -34,24 +34,46 @@ export class User extends Model<User, UserCreationAttrs> {
   })
   id: number;
 
+
+
+  @Column({ type: DataType.STRING, unique: true, allowNull: true })
+  phoneNumber?: string;
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  verificationCode?: string; // Храним код (желательно захешированный)
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  verificationExpires?: Date; // Срок действия кода
+
+  @Column({ type: DataType.INTEGER, defaultValue: 0 })
+  verificationAttempts?: number; // Количество попыток ввода
+
+  @Column({ type: DataType.BOOLEAN, defaultValue: true })
+  isRegistered?: boolean; // Успешно ли прошел верификацию
+
+
+
+
+
+
   @ApiProperty({ example: 'user@gmail.com', description: 'unique email' })
-  @Column({ type: DataType.STRING, unique: true, allowNull: false })
-  email: string;
+  @Column({ type: DataType.STRING, unique: true, allowNull: true })
+  email?: string;
 
   @ApiProperty({ example: '1234', description: 'password' })
-  @Column({ type: DataType.STRING, allowNull: false })
-  password: string;
+  @Column({ type: DataType.STRING, allowNull: true })
+  password?: string;
 
   @ApiProperty({ example: 'Ivan Pupkin', description: 'full name, splitted' })
-  @Column({ type: DataType.STRING, allowNull: false })
-  fullName: string;
+  @Column({ type: DataType.STRING, allowNull: true })
+  fullName?: string;
 
-  @ApiProperty({
-    example: '8-989-898-98-98',
-    description: 'Phone number like string',
-  })
-  @Column({ type: DataType.STRING, allowNull: false })
-  phoneNumber: string;
+  // @ApiProperty({
+  //   example: '8-989-898-98-98',
+  //   description: 'Phone number like string',
+  // })
+  // @Column({ type: DataType.STRING, allowNull: false })
+  // phoneNumber: string;
 
   @BelongsToMany(() => Role, () => UserRoles)
   roles: Role[];

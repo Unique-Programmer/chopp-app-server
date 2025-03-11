@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsOptional, IsString, Length } from 'class-validator';
+import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsPhoneNumber, IsString, Length } from 'class-validator';
 import { USER_ROLE } from 'src/shared/enums';
 
 const PASSWORD_MINIMAL_LENGTH = 8;
@@ -38,4 +38,23 @@ export class RefreshDto {
   @ApiProperty({ example: 'asdd334safs', description: 'refresh token' })
   @IsString({ message: 'STRING field type expected' })
   readonly refreshToken: string;
+}
+
+export class LoginDto {
+  @ApiProperty({ example: '+79876543210', description: 'Phone number' })
+  @IsNotEmpty()
+  @IsPhoneNumber()
+  phoneNumber: string;
+}
+
+export class VerifyCodeDto {
+  @ApiProperty({ example: '+79876543210', description: 'Phone number' })
+  @IsNotEmpty()
+  @IsPhoneNumber()
+  phoneNumber: string;
+
+  @ApiProperty({ example: '1234', description: '4-digit verification code' })
+  @IsNotEmpty()
+  @Length(4, 4)
+  code: string;
 }
