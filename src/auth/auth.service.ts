@@ -14,7 +14,7 @@ export class AuthService {
     private usersService: UsersService,
     // chnage to passport js
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   private async generateTokens(user: User) {
     const payload = { email: user.email, id: user.id, roles: user.roles };
@@ -31,19 +31,18 @@ export class AuthService {
     };
   }
 
-
-  private generateCode(): string {
-    return Math.floor(1000 + Math.random() * 9000).toString(); // 4-значный код
+  private getSixCharCode(): string {
+    return Math.floor(100000 + Math.random() * 900000).toString(); // 6-значный код
   }
 
-  async loginByCode(phoneNumber: string) {
+  async generateCode(phoneNumber: string) {
     let user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user) {
       user = await this.usersService.createUser({ phoneNumber, isRegistered: false });
     }
 
-    const code = this.generateCode();
+    const code = this.getSixCharCode();
     const hashedCode = await bcrypt.hash(code, 5);
 
     await user.update({
@@ -95,11 +94,8 @@ export class AuthService {
       throw new HttpException('Wait before requesting a new code', HttpStatus.TOO_MANY_REQUESTS);
     }
 
-    return this.loginByCode(phoneNumber);
+    return this.generateCode(phoneNumber);
   }
-
-
-
 
   private checkByRoleContext(user: User, context: USER_ROLE): boolean {
     const [role] = user.roles;
@@ -108,7 +104,6 @@ export class AuthService {
   }
 
   private async checkValidityUser(authDto: AuthDto) {
-
     let user;
 
     console.log('authDto: ', authDto);
@@ -128,12 +123,9 @@ export class AuthService {
 
     if (!this.checkByRoleContext(user, authDto.context)) {
       throw new HttpException('Access denied for this role', HttpStatus.FORBIDDEN);
-    };
+    }
 
-    const isPasswordsEquals = await bcrypt.compare(
-      authDto.password,
-      user.password,
-    );
+    const isPasswordsEquals = await bcrypt.compare(authDto.password, user.password);
     if (!isPasswordsEquals) {
       throw new UnauthorizedException({ message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD });
     }

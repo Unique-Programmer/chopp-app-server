@@ -72,10 +72,10 @@ export class AuthController {
 
 
 
-  @Post('/loginByCode')
+  @Post('/generateCode')
   @ApiOperation({ summary: 'Request a verification code' })
-  async loginByCode(@Body() { phoneNumber }: LoginDto) {
-    return this.authService.loginByCode(phoneNumber);
+  async generateCode(@Body() { phoneNumber }: LoginDto) {
+    return this.authService.generateCode(phoneNumber);
   }
 
   @Post('/verify')
