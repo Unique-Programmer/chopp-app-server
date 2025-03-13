@@ -1,13 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import {
-  BelongsTo,
-  BelongsToMany,
-  Column,
-  DataType,
-  HasOne,
-  Model,
-  Table,
-} from 'sequelize-typescript';
+import { BelongsTo, BelongsToMany, Column, DataType, HasOne, Model, Table } from 'sequelize-typescript';
 import { Role } from '../roles/roles.model';
 import { UserRoles } from 'src/roles/user-roles.model';
 import { UserRO } from './dto/create-user.dto';
@@ -34,8 +26,6 @@ export class User extends Model<User, UserCreationAttrs> {
   })
   id: number;
 
-
-
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
   phoneNumber?: string;
 
@@ -51,10 +41,8 @@ export class User extends Model<User, UserCreationAttrs> {
   @Column({ type: DataType.BOOLEAN, defaultValue: true })
   isRegistered?: boolean; // Успешно ли прошел верификацию
 
-
-
-
-
+  @Column({ type: DataType.STRING, allowNull: true })
+  telegramUserId?: string;
 
   @ApiProperty({ example: 'user@gmail.com', description: 'unique email' })
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
@@ -82,10 +70,10 @@ export class User extends Model<User, UserCreationAttrs> {
   chats: Chat[];
 
   @HasOne(() => ShoppingCart)
-  shoppingCart: ShoppingCart
+  shoppingCart: ShoppingCart;
 
   @HasOne(() => Order)
-  order: Order
+  order: Order;
 
   sanitizeUser(): UserRO {
     const responseObject: UserRO = { ...this };
