@@ -8,12 +8,12 @@ import { Role } from './roles/roles.model';
 import { UserRoles } from './roles/user-roles.model';
 import { AuthModule } from './auth/auth.module';
 import { CategoriesModule } from './categories/categories.module';
-import { PricingModule } from './pricing/pricing.module';
+import { ClientAppConfigModule } from './client-app-config/client-app-config.module';
 import { ProductsModule } from './products/products.module';
 import { FilesModule } from './files/files.module';
 import { Category } from './categories/category.model';
 import { Product } from './products/product.model';
-import { PricingConfig } from './pricing/pricing-config.model';
+import { ClientAppConfig } from './client-app-config/client-app-config.model';
 import { FileModel } from './files/file.model';
 import { ProductFile } from './products/product-file.model';
 import { WebsocketsModule } from './websockets/websockets.module';
@@ -61,7 +61,7 @@ import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
         ChatMessages,
         Category,
         Product,
-        PricingConfig,
+        ClientAppConfig,
         FileModel,
         ProductFile,
         ShoppingCart,
@@ -80,7 +80,7 @@ import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
     MessagesModule,
     WebsocketsModule,
     CategoriesModule,
-    PricingModule,
+    ClientAppConfigModule,
     ProductsModule,
     FilesModule,
     ShoppingCartModule,

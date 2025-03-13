@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
-@Table({ tableName: 'pricing_config' })
-export class PricingConfig extends Model<PricingConfig> {
+@Table({ tableName: 'client_app_config' })
+export class ClientAppConfig extends Model<ClientAppConfig> {
   @ApiProperty({
     example: '1',
-    description: 'The unique identifier for the pricing configuration',
+    description: 'The unique identifier for the client app configuration',
   })
   @Column({
     type: DataType.INTEGER,
