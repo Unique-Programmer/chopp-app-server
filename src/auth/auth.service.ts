@@ -7,6 +7,10 @@ import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
 import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
+import { NotificationsService } from '../notifications/notifications.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +18,7 @@ export class AuthService {
     private usersService: UsersService,
     // chnage to passport js
     private jwtService: JwtService,
+    private notificationsService: NotificationsService,
   ) {}
 
   private async generateTokens(user: User) {
@@ -43,6 +48,8 @@ export class AuthService {
     }
 
     const code = this.getSixCharCode();
+    await this.notificationsService.sendVerificationCode(phoneNumber, code);
+
     const hashedCode = await bcrypt.hash(code, 5);
 
     await user.update({
