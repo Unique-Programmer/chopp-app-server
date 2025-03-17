@@ -45,4 +45,37 @@ export class ClientAppConfig extends Model<ClientAppConfig> {
     allowNull: true,
   })
   freeDeliveryThreshold?: number;
+
+  @ApiProperty({
+    example: '09:00',
+    description: 'Время начала работы сервиса для клиентов в формате ISO',
+    required: false,
+  })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  openTime?: string;
+
+  @ApiProperty({
+    example: '21:00',
+    description: 'Время окончания работы сервиса для клиентов',
+    required: false,
+  })
+  @Column({
+    type: DataType.STRING,
+    allowNull: true,
+  })
+  closeTime?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Ведется ли прием заказов',
+    required: false,
+  })
+  @Column({
+    type: DataType.BOOLEAN,
+    allowNull: true,
+  })
+  disabled?: boolean;
 }
