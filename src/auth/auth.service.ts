@@ -7,10 +7,7 @@ import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
 import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
-import { NotificationsService } from '../notifications/notifications.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject } from '@nestjs/common';
-import { Cache } from 'cache-manager';
+import { SubmitLoginService } from '../submit-login/submit-login.service';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +15,7 @@ export class AuthService {
     private usersService: UsersService,
     // chnage to passport js
     private jwtService: JwtService,
-    private notificationsService: NotificationsService,
+    private notificationsService: SubmitLoginService,
   ) {}
 
   private async generateTokens(user: User) {

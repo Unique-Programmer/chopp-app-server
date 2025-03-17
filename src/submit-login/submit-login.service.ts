@@ -4,9 +4,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Cache } from 'cache-manager';
 
 @Injectable()
-export class NotificationsService {
-  private readonly logger = new Logger(NotificationsService.name);
-
+export class SubmitLoginService {
   constructor(
     private readonly telegramService: TelegramService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,

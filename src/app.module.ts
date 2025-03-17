@@ -35,7 +35,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { OrderStats } from './order/order-stats.model';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
-import { NotificationsModule } from './notifications/notifications.module';
+import { SubmitLoginModule } from './submit-login/submit-login.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
@@ -101,7 +101,7 @@ import * as redisStore from 'cache-manager-redis-store';
     FileCleanupModule,
     ScheduleModule.forRoot(),
     TelegramModule,
-    NotificationsModule,
+    SubmitLoginModule,
   ],
   controllers: [],
   providers: [],
