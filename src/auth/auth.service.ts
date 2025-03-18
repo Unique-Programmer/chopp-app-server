@@ -7,6 +7,7 @@ import { User } from 'src/users/users.model';
 import { AuthDto } from './dto/auth.dto';
 import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
+import { SubmitLoginService } from '../submit-login/submit-login.service';
 
 @Injectable()
 export class AuthService {
@@ -14,6 +15,7 @@ export class AuthService {
     private usersService: UsersService,
     // chnage to passport js
     private jwtService: JwtService,
+    private submitLoginService: SubmitLoginService,
   ) {}
 
   private async generateTokens(user: User) {
@@ -43,6 +45,8 @@ export class AuthService {
     }
 
     const code = this.getSixCharCode();
+    await this.submitLoginService.sendVerificationCode(phoneNumber, code);
+
     const hashedCode = await bcrypt.hash(code, 5);
 
     await user.update({
@@ -106,7 +110,6 @@ export class AuthService {
   private async checkValidityUser(authDto: AuthDto) {
     let user;
 
-    console.log('authDto: ', authDto);
     if (authDto.email) {
       user = await this.usersService.getUserByFieldName(authDto.email, 'email', true);
     } else if (authDto.phoneNumber) {

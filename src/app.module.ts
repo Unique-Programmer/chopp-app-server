@@ -35,11 +35,22 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { OrderStats } from './order/order-stats.model';
 import { ScheduleModule } from '@nestjs/schedule';
 import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
+import { SubmitLoginModule } from './submit-login/submit-login.module';
+import { TelegramModule } from './telegram/telegram.module';
+import { CacheModule } from '@nestjs/cache-manager';
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV}`,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+      ttl: 300, // 5 минут
     }),
     // ServeStaticModule.forRoot({
     //   rootPath: join(__dirname, '..', 'client'),
@@ -89,6 +100,8 @@ import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
     AnalyticsModule,
     FileCleanupModule,
     ScheduleModule.forRoot(),
+    TelegramModule,
+    SubmitLoginModule,
   ],
   controllers: [],
   providers: [],
