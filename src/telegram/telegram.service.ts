@@ -26,12 +26,14 @@ export class TelegramService implements OnModuleInit {
       this.logger.error('TELEGRAM_BOT_TOKEN not found in .env file');
       return;
     }
+
     this.startPolling();
     this.logger.log('Telegram bot started successfully');
   }
 
   private async startPolling() {
     let offset = 0;
+  
     const poll = async () => {
       const response = await lastValueFrom(
         this.httpService.get(`${this.apiUrl}/getUpdates`, {
@@ -53,6 +55,7 @@ export class TelegramService implements OnModuleInit {
 
       setTimeout(poll, 1000);
     };
+
     poll();
   }
 
@@ -85,7 +88,7 @@ export class TelegramService implements OnModuleInit {
     if (!user) {
       await this.sendMessage(
         chatId,
-        '❌ <b>Пользователь не найден!</b>\n\nВозможные причины:\n• Номер телефона не зарегистрирован в системе\n• Неверный формат номера\n\n📲 Пожалуйста, сначала зарегистрируйтесь в приложении Chopp.',
+        '❌ <b>Пользователь не найден!</b>\n\nВозможные причины:\n• Номер телефона еще не внесен в систему\n• Неверный формат номера\n\n📲 Пожалуйста, нажмите "Войти" или добавьте товары в корзину в приложении Chopp [ссылка].',
       );
       return;
     }
