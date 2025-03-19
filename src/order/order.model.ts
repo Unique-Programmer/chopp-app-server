@@ -59,4 +59,10 @@ export class Order extends Model<Order> {
 
   @Column({ type: DataType.TEXT })
   comment: string;
+
+  @Column({ type: DataType.TEXT })
+  name: string;
+
+  @Column({ type: DataType.TEXT })
+  phoneNumber: string;
 }

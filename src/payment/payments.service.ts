@@ -72,15 +72,19 @@ export class PaymentsService {
     params?: Record<string, any>, // Новый аргумент для параметров запроса
   ): Promise<T> {
 
-    const paramsNormalized = new URLSearchParams();
+    
+    let paramsNormalized = undefined;
 
-    Object.entries(params).forEach(([key, value]) => {
-      if(Array.isArray(value)) {
-        value.forEach((s) => paramsNormalized.append(key, s));
-      } else {
-        paramsNormalized.append(key, value)
-      }
-    })
+    if(params) {
+      paramsNormalized = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if(Array.isArray(value)) {
+          value.forEach((s) => paramsNormalized.append(key, s));
+        } else {
+          paramsNormalized.append(key, value)
+        }
+      })
+    }
 
     try {
       const response = await this.httpService

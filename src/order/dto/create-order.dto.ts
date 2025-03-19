@@ -8,7 +8,7 @@ export class CreateOrderDTO {
   returnUrl: string;
 
   @ApiProperty({
-    example: 'Москва, Арбат 1',
+    example: 'Москва, улица Красавчиков 1',
     description: 'Адрес',
   })
   address: string;
@@ -18,4 +18,16 @@ export class CreateOrderDTO {
     description: 'Комментарий',
   })
   comment: string;
+
+  @ApiProperty({
+    example: 'Иван',
+    description: 'Имя получателя',
+  })
+  name: string;
+
+  @ApiProperty({
+    example: 'Телефон получателя',
+    description: 'Телефон получателя',
+  })
+  phoneNumber: string;
 }

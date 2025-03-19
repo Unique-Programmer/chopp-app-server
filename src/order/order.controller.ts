@@ -40,6 +40,27 @@ export class OrderController {
           description: 'URL, на который будет перенаправлен пользователь после оплаты',
           example: 'https://yourfrontend.com/order-confirmation/123',
         },
+        address: {
+          type: 'string',
+          description: 'Адрес доставки',
+          example: 'ул. Толстых',
+        },
+        comment: {
+          type: 'string',
+          description: 'Комментарий',
+          example: 'Не стучите, звоните',
+        },
+        name: {
+          type: 'string',
+          description: 'Имя получателя',
+          example: 'Иван Пупкин',
+        },
+        phoneNumber: {
+          type: 'string',
+          description: 'Телефон поолучателя',
+          example: '8888888888',
+        },
+        
       },
       required: ['returnUrl'],
     },
