@@ -38,6 +38,10 @@ export class AuthService {
   }
 
   async generateCode(phoneNumber: string) {
+    if (!phoneNumber) {
+      throw new UnauthorizedException('Invalid phone number.');
+    }
+
     let user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user) {
@@ -61,6 +65,10 @@ export class AuthService {
   }
 
   async verifyCode(phoneNumber: string, code: string) {
+    if (!phoneNumber) {
+      throw new UnauthorizedException('Invalid phone number or verification code.');
+    }
+
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user || !user.verificationCode) {
