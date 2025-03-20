@@ -50,14 +50,14 @@ services:
 
   frontend-client:
     container_name: frontend-client
-    build: ./frontend-client
+    build: ../../app-frontend-client/chopp-app-client/
     restart: always
     networks:
       - app-network
 
   frontend-admin:
     container_name: frontend-admin
-    build: ./frontend-admin
+    build: ../../app-frontend-admin/chopp-app-admin/
     restart: always
     networks:
       - app-network
