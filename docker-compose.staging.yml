@@ -64,7 +64,8 @@ services:
 
   nginx:
     container_name: nginx
-    build: ./nginx.conf
+    build:
+      context: ./nginx
     restart: always
     ports:
       - "80:80"
