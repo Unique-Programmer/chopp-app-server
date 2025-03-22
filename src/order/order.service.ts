@@ -218,6 +218,7 @@ export class OrderService {
         id: item.product?.id,
         title: item.product?.title,
         price: item.product?.price,
+        description: item.product?.description,
         category: item.product?.category?.title || 'Другое',
         images: item.product?.images, // Включаем изображения
       },

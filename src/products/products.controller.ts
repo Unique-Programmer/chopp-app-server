@@ -13,15 +13,17 @@ import {
   UseGuards,
   Patch,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { FilesService } from '../files/files.service';
 import { ProductService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiParam, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PRODUCT_STATE } from 'src/shared/enums';
+import { Product } from './product.model';
 
 @ApiTags('products')
 @Controller('products')
@@ -125,6 +127,31 @@ export class ProductsController {
       stateArray, // Передаем массив состояний
     );
   }
+
+  @Get(':id')
+@ApiOperation({ summary: 'Get product by ID' })
+@ApiParam({
+  name: 'id',
+  type: Number,
+  description: 'Unique identifier of the product',
+  example: 42,
+})
+@ApiResponse({
+  status: 200,
+  description: 'Product successfully retrieved',
+  type: Product, // укажи правильный DTO, который возвращается
+})
+@ApiResponse({
+  status: 404,
+  description: 'Product not found',
+})
+async getProductById(@Param('id') id: number) {
+  const product = await this.productService.findProductById(Number(id));
+  if (!product) {
+    throw new NotFoundException(`Product with ID ${id} not found`);
+  }
+  return product;
+}
 
   @Patch(':id/state')
   @ApiBody({

@@ -124,6 +124,14 @@ export class ProductService {
     };
   }
 
+  async findProductById(id: number) {
+    return this.productRepository.findOne({
+      where: { id },
+      include: [{ model: FileModel, as: 'images' }, { model: Category }],
+      attributes: { exclude: ['categoryId'] },
+    });
+  }
+
   async updateProductState(productId: number, state: PRODUCT_STATE): Promise<Product> {
     const product = await this.productRepository.findByPk(productId);
 
