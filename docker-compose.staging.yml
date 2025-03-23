@@ -47,13 +47,15 @@ services:
     restart: always
     networks:
       - app-network
-
+  
   frontend-client:
     container_name: frontend-client
     build: ../../app-frontend-client/chopp-app-client/
     restart: always
     networks:
       - app-network
+    volumes:
+      - ./assets:/usr/share/nginx/html/assets
 
   frontend-admin:
     container_name: frontend-admin
