@@ -112,7 +112,7 @@ export class ProductsController {
     @Query('categoryId') categoryId?: number,
     @Query('search') search?: string,
     @Query('sort') sort?: string,
-    @Query('order') order: 'ASC' | 'DESC' = 'ASC',
+    @Query('order') order: 'ASC' | 'DESC' = 'DESC',
     @Query('state') state?: PRODUCT_STATE | PRODUCT_STATE[], // Массив состояний
   ) {
     const stateArray = Array.isArray(state) ? state : state ? [state] : undefined;
