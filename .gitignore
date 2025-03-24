@@ -3,6 +3,9 @@
 /node_modules
 /build
 /uploads
+/deploy-stage-server/node_modules/
+/deploy-stage-server/package-lock.json
+/deploy-stage-server/package.json
 
 # Logs
 logs
