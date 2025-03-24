@@ -13,10 +13,10 @@ case "$project" in
     repo_dir="/home/vlad/app-backend"
     ;;
   client)
-    repo_dir="/home/vlad/app-frontend-client"
+    repo_dir="/home/vlad/app-frontend-client/chopp-app-client"
     ;;
   admin)
-    repo_dir="/home/vlad/app-frontend-admin"
+    repo_dir="/home/vlad/app-frontend-admin/chopp-app-admin"
     ;;
   *)
     echo "❌ Unknown project: $project"
