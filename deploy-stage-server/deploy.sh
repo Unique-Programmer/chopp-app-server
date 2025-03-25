@@ -10,7 +10,7 @@ echo "🌿 Branch: $branch"
 
 case "$project" in
   backend)
-    repo_dir="/home/vlad/app-backend"
+    repo_dir="/home/vlad/app-backend/chopp-app-server"
     ;;
   client)
     repo_dir="/home/vlad/app-frontend-client/chopp-app-client"
