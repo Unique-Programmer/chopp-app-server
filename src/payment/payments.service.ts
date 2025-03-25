@@ -14,6 +14,7 @@ import { NotificationService } from 'src/websockets/notification/notification.se
 import { PAYMENT_STATUS, WS_MESSAGE_TYPE } from 'src/shared/enums/';
 import { User } from 'src/users/users.model';
 import qs from 'qs';
+import { AxiosRequestConfig } from 'axios';
 
 @Injectable()
 export class PaymentsService {
@@ -68,49 +69,70 @@ export class PaymentsService {
     url: string,
     method: 'GET' | 'POST',
     data?: any,
-    headers?: Record<string, string>,
-    params?: Record<string, any>, // Новый аргумент для параметров запроса
+    headers: Record<string, string> = {},
+    params?: Record<string, any>,
   ): Promise<T> {
-    let paramsNormalized = undefined;
-
-    console.log('--- 3 params: ', params)
-    if (params) {
-      paramsNormalized = new URLSearchParams();
-      console.log('--- 4 paramsNormalized: ', paramsNormalized)
-      Object.entries(params).forEach(([key, value]) => {
-        if (Array.isArray(value)) {
-          value.forEach((s) => paramsNormalized.append(key, s));
-        } else {
-          paramsNormalized.append(key, value);
-        }
-      });
-    }
-
     try {
-      console.log('--- 5 url: ', url)
-      console.log('--- 6 method: ', method)
-      console.log('--- 7 data: ', data)
-      console.log('--- 8 headers: ', headers)
-      console.log('--- 9 paramsNormalized: ', paramsNormalized)
-
-      const response = await this.httpService
-        .request<T>({
-          url,
-          method,
-          data: method !== 'GET' ? data : undefined,
-          headers,
-          params: paramsNormalized,
-          timeout: 5000
-        })
-        .toPromise();
-
-        console.log('--- 9 response: ', response)
+      // 🌿 Очистка заголовков для GET-запроса
+      if (method === 'GET' && headers['Content-Type']) {
+        delete headers['Content-Type'];
+      }
+  
+      // 🌐 Нормализация query-параметров
+      let paramsNormalized: URLSearchParams | undefined = undefined;
+      if (params && Object.keys(params).length > 0) {
+        paramsNormalized = new URLSearchParams();
+        Object.entries(params).forEach(([key, value]) => {
+          if (Array.isArray(value)) {
+            value.forEach((v) => paramsNormalized!.append(key, v));
+          } else {
+            paramsNormalized!.append(key, value);
+          }
+        });
+      }
+  
+      // 🛠️ Сборка конфига
+      const config: AxiosRequestConfig = {
+        url,
+        method,
+        headers,
+        timeout: 5000,
+        params: paramsNormalized,
+      };
+  
+      // ✏️ Добавляем тело только если не GET
+      if (method !== 'GET' && data !== undefined) {
+        config.data = data;
+      }
+  
+      // 🧪 Отладка
+      console.log('🌐 Запрос:', {
+        url,
+        method,
+        headers,
+        params: paramsNormalized?.toString(),
+        data: config.data,
+      });
+  
+      const response = await this.httpService.request<T>(config).toPromise();
+  
+      console.log('✅ Ответ:', response.status, response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Request failed:', error);
-      throw new NotFoundException(error.response?.data || 'Unexpected error occurred');
+      console.error('❌ Ошибка запроса:', {
+        message: error.message,
+        code: error.code,
+        url,
+        method,
+        headers,
+      });
+  
+      throw new NotFoundException(
+        error.response?.data || 'Unexpected error occurred',
+      );
     }
   }
+  
 
   async createPayment({
     amount,
