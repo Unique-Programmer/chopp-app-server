@@ -97,7 +97,7 @@ export class PaymentsService {
         .request<T>({
           url,
           method,
-          data,
+          data: method !== 'GET' ? data : undefined,
           headers,
           params: paramsNormalized,
           timeout: 5000
