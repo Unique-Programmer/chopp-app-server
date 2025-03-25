@@ -100,12 +100,14 @@ export class PaymentsService {
           data,
           headers,
           params: paramsNormalized,
+          timeout: 5000
         })
         .toPromise();
 
         console.log('--- 9 response: ', response)
       return response.data;
     } catch (error) {
+      console.error('❌ Request failed:', error);
       throw new NotFoundException(error.response?.data || 'Unexpected error occurred');
     }
   }
