@@ -103,6 +103,7 @@ export class PaymentsService {
         })
         .toPromise();
 
+        console.log('--- 9 response: ', response)
       return response.data;
     } catch (error) {
       throw new NotFoundException(error.response?.data || 'Unexpected error occurred');
