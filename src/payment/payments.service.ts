@@ -71,29 +71,35 @@ export class PaymentsService {
     headers?: Record<string, string>,
     params?: Record<string, any>, // Новый аргумент для параметров запроса
   ): Promise<T> {
-
-    
     let paramsNormalized = undefined;
 
-    if(params) {
+    console.log('--- 3 params: ', params)
+    if (params) {
       paramsNormalized = new URLSearchParams();
+      console.log('--- 4 paramsNormalized: ', paramsNormalized)
       Object.entries(params).forEach(([key, value]) => {
-        if(Array.isArray(value)) {
+        if (Array.isArray(value)) {
           value.forEach((s) => paramsNormalized.append(key, s));
         } else {
-          paramsNormalized.append(key, value)
+          paramsNormalized.append(key, value);
         }
-      })
+      });
     }
 
     try {
+      console.log('--- 5 url: ', url)
+      console.log('--- 6 method: ', method)
+      console.log('--- 7 data: ', data)
+      console.log('--- 8 headers: ', headers)
+      console.log('--- 9 paramsNormalized: ', paramsNormalized)
+
       const response = await this.httpService
         .request<T>({
           url,
           method,
           data,
           headers,
-          params: paramsNormalized
+          params: paramsNormalized,
         })
         .toPromise();
 
@@ -200,7 +206,8 @@ export class PaymentsService {
   }
 
   async getPayments(params: Record<string, any>): Promise<any> {
-    const headers = this.createHeaders();
+    const headers = this.createHeaders(String(Math.round(Math.random() * 1000000)));
+    console.log('--- 2 headers: ', headers);
     return this.makeHttpRequest(`${YOOKASSA_URL}/payments`, 'GET', null, headers, params);
   }
 
