@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.0'
 
 services:
   main:
@@ -9,17 +9,13 @@ services:
       - .env.development
     volumes:
       - .:/app
+      # - /app/node_modules
       - ./node_modules:/app/node_modules
-    ports:
-      - 6001:6000
-      - 9229:9229
+    network_mode: host
     command: npm run start:dev
     depends_on:
       - postgres
-      - redis
     restart: always
-    networks:
-      - app-network
 
   postgres:
     container_name: postgres
@@ -33,8 +29,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     restart: always
-    networks:
-      - app-network
 
   redis:
     container_name: redis
@@ -45,43 +39,7 @@ services:
       - redisdata:/data
     command: redis-server --save 60 1 --loglevel warning
     restart: always
-    networks:
-      - app-network
-  
-  frontend-client:
-    container_name: frontend-client
-    build: ../../app-frontend-client/chopp-app-client/
-    restart: always
-    networks:
-      - app-network
-    volumes:
-      - ./assets:/usr/share/nginx/html/assets
-
-  frontend-admin:
-    container_name: frontend-admin
-    build: ../../app-frontend-admin/chopp-app-admin/
-    restart: always
-    networks:
-      - app-network
-
-  nginx:
-    container_name: nginx
-    build:
-      context: ./nginx
-    restart: always
-    ports:
-      - "80:80"
-    depends_on:
-      - main
-      - frontend-client
-      - frontend-admin
-    networks:
-      - app-network
 
 volumes:
   pgdata:
   redisdata:
-
-networks:
-  app-network:
-    driver: bridge
