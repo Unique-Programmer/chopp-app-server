@@ -5,6 +5,7 @@ services:
     container_name: main
     build:
       context: .
+    network_mode: host
     env_file:
       - .env.development
     volumes:
