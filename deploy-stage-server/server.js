@@ -29,9 +29,9 @@ app.get('/', (req, res) => {
 
 app.post('/deploy', (req, res) => {
   const repos = [
-    { name: 'backend', branch: req.body.backend_branch },
-    { name: 'client', branch: req.body.client_branch },
-    { name: 'admin', branch: req.body.admin_branch },
+    { name: 'backend', branch: req.body.backend_branch || 'main' },
+    { name: 'client', branch: req.body.client_branch || 'master'},
+    { name: 'admin', branch: req.body.admin_branch || 'main' },
   ];
 
   const logFile = path.join(__dirname, 'logs/deploy.log');
