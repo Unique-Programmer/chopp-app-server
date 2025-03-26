@@ -78,4 +78,37 @@ export class ClientAppConfig extends Model<ClientAppConfig> {
     allowNull: true,
   })
   disabled?: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"Доставка и оплата\"',
+    required: false,
+  })
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  deliveryAndPaymentsVerbose?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"Публичаня оферта\"',
+    required: false,
+  })
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  publicOfferVerbose?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"О нас\"',
+    required: false,
+  })
+  @Column({
+    type: DataType.TEXT,
+    allowNull: true,
+  })
+  description?: string;
 }

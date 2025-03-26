@@ -42,4 +42,25 @@ export class CreateClientAppConfigDto {
     required: false,
   })
   disabled?: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"Доставка и оплата\"',
+    required: false,
+  })
+  deliveryAndPaymentsVerbose?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"Публичаня оферта\"',
+    required: false,
+  })
+  publicOfferVerbose?: string;
+
+  @ApiProperty({
+    example: true,
+    description: 'Этот текст будет указан на странице \"О нас\"',
+    required: false,
+  })
+  description?: string;
 }

@@ -40,6 +40,7 @@ import { TelegramModule } from './telegram/telegram.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 
+console.log('process.env: ', process.env)
 @Module({
   imports: [
     ConfigModule.forRoot({
