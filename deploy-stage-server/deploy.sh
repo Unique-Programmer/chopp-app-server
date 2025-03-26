@@ -33,7 +33,7 @@ git pull origin "$branch"
 npm i
 
 if [ "$project" = "backend" ]; then
-  docker-compose down
+  docker-compose down || true
   docker-compose -f docker-compose.staging.yml up -d --build
 elif [ "$project" = "client" ]; then
   npm run build-ignore-ts
