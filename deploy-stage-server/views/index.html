@@ -1,22 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="UTF-8">
-  <title>Deploy Panel</title>
-</head>
-<body style="font-family: sans-serif; padding: 2rem;">
-  <h2>🚀 Deploy Panel</h2>
-  <form method="POST" action="/deploy">
-    <label>Backend ветка:</label><br>
-    <input type="text" name="backend_branch" placeholder="main / dev / feature-xyz"><br><br>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Deploy Panel</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 2rem;
+      }
+      h2 {
+        margin-bottom: 1rem;
+      }
+      form,
+      .actions {
+        margin-bottom: 2rem;
+      }
+      label {
+        font-weight: bold;
+      }
+      input[type='text'] {
+        width: 300px;
+        padding: 0.4rem;
+        margin-top: 0.2rem;
+      }
+      button {
+        margin-top: 1rem;
+        padding: 0.5rem 1rem;
+        font-weight: bold;
+        cursor: pointer;
+      }
+      .actions button {
+        display: block;
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>🚀 Deploy Panel</h2>
+    <form method="POST" action="/deploy">
+      <label>Backend ветка (main):</label><br />
+      <input type="text" name="backend_branch" placeholder="main / dev / feature-xyz" /><br /><br />
 
-    <label>Frontend Client ветка:</label><br>
-    <input type="text" name="client_branch" placeholder="main / dev / feature-xyz"><br><br>
+      <label>Frontend Client ветка (master):</label><br />
+      <input type="text" name="client_branch" placeholder="main / dev / feature-xyz" /><br /><br />
 
-    <label>Admin Panel ветка:</label><br>
-    <input type="text" name="admin_branch" placeholder="main / dev / feature-xyz"><br><br>
+      <label>Admin Panel ветка (main):</label><br />
+      <input type="text" name="admin_branch" placeholder="main / dev / feature-xyz" /><br /><br />
 
-    <button type="submit">🔥 Деплой!</button>
-  </form>
-</body>
+      <button type="submit">🔥 Запустить деплой</button>
+    </form>
+
+    <div class="actions">
+      <form method="POST" action="/command">
+        <input type="hidden" name="cmd" value="down" />
+        <button type="submit">🛑 Остановить docker-compose (backend) `docker-compose down`</button>
+      </form>
+
+      <form method="POST" action="/command">
+        <input type="hidden" name="cmd" value="down-volumes" />
+        <button type="submit">🧹 Удалить контейнеры и тома `docker-compose down --volumes --rmi all`</button>
+      </form>
+
+      <form method="POST" action="/command">
+        <input type="hidden" name="cmd" value="remove-images" />
+        <button type="submit">🗑 Удалить все Docker images `docker rmi $(docker images -q)`</button>
+      </form>
+
+      <form method="POST" action="/command">
+        <input type="hidden" name="cmd" value="staging-up" />
+        <button type="submit">
+          🚀 Запустить docker-compose.staging.yml `docker-compose', '-f', 'docker-compose.staging.yml up -d --build`
+        </button>
+      </form>
+    </div>
+  </body>
 </html>

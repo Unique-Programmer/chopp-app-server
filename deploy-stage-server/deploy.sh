@@ -4,6 +4,7 @@ set -e
 
 project=$1
 branch=$2
+start_time=$(date +%s)
 
 echo "📁 Project: $project"
 echo "🌿 Branch: $branch"
@@ -25,24 +26,31 @@ case "$project" in
 esac
 
 cd "$repo_dir"
-echo "🔄 Pulling from $branch..."
-git fetch
-git checkout "$branch"
+echo "🔄 Pulling latest changes from $branch..."
+
+git fetch origin
+git checkout "$branch" || git checkout -b "$branch" origin/"$branch"
 git pull origin "$branch"
 
-npm i
+echo "📦 Installing dependencies..."
+npm install
 
 if [ "$project" = "backend" ]; then
+  echo "🛠 Rebuilding backend containers..."
   docker-compose down || true
   docker-compose -f docker-compose.staging.yml up -d --build
 elif [ "$project" = "client" ]; then
+  echo "🛠 Building client frontend..."
   npm run build-ignore-ts
   sudo rm -rf /var/www/frontend-client/*
   sudo cp -r dist/* /var/www/frontend-client/
 elif [ "$project" = "admin" ]; then
+  echo "🛠 Building admin panel..."
   npm run build-ignore-ts
   sudo rm -rf /var/www/frontend-admin/*
   sudo cp -r dist/* /var/www/frontend-admin/
 fi
 
-echo "✅ Deploy complete for $project:$branch"
+end_time=$(date +%s)
+duration=$((end_time - start_time))
+echo "✅ Deploy complete for $project:$branch in ${duration}s"
