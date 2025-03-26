@@ -7,15 +7,14 @@
 <body style="font-family: sans-serif; padding: 2rem;">
   <h2>🚀 Deploy Panel</h2>
   <form method="POST" action="/deploy">
-    <label>Проект:</label><br>
-    <select name="project" required>
-      <option value="backend">Backend</option>
-      <option value="client">Frontend Client</option>
-      <option value="admin">Admin Panel</option>
-    </select><br><br>
+    <label>Backend ветка:</label><br>
+    <input type="text" name="backend_branch" placeholder="main / dev / feature-xyz" required><br><br>
 
-    <label>Ветка:</label><br>
-    <input type="text" name="branch" placeholder="main / dev / feature-xyz" required><br><br>
+    <label>Frontend Client ветка:</label><br>
+    <input type="text" name="client_branch" placeholder="main / dev / feature-xyz" required><br><br>
+
+    <label>Admin Panel ветка:</label><br>
+    <input type="text" name="admin_branch" placeholder="main / dev / feature-xyz" required><br><br>
 
     <button type="submit">🔥 Деплой!</button>
   </form>
