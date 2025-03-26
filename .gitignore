@@ -49,6 +49,8 @@ lerna-debug.log*
 .env.local
 .env.stg
 
+start-this-shit.sh
+
 # temp directory
 .temp
 .tmp
