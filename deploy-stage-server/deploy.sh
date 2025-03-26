@@ -34,7 +34,7 @@ npm i
 
 if [ "$project" = "backend" ]; then
   docker-compose down
-  docker-compose up -d --build
+  docker-compose -f docker-compose.staging.yml up -d --build
 elif [ "$project" = "client" ]; then
   npm run build-ignore-ts
   sudo rm -rf /var/www/frontend-client/*
