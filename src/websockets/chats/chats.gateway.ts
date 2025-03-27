@@ -8,7 +8,7 @@ import {
 
 import { Socket } from 'socket.io';
 import { BaseGateway } from '../gateways/base.gateway';
-import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from '../../middlewares/ws-jwt-middleware';
 import { ChatsService } from './chats.service';
 import { Message } from './messages.model';
 import { Server } from 'socket.io';

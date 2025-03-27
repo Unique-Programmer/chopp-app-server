@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { NotificationGateway } from './notification.gateway';
 import { NotificationService } from './notification.service';
-import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from '../../middlewares/ws-jwt-middleware';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ActiveSession } from '../active-sessions/active-session.model';
 import { JwtService } from '@nestjs/jwt';

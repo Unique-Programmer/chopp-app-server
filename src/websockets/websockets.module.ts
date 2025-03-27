@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { WsJwtMiddleware } from './middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ActiveSession } from './active-sessions/active-session.model';
 import { ActiveSessionModule } from './active-sessions/active-session.module';

@@ -6,7 +6,7 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from '../../middlewares/ws-jwt-middleware';
 import { BaseGateway } from '../gateways/base.gateway';
 import { WsMessage } from 'src/shared/types';
 

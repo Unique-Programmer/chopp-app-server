@@ -12,7 +12,7 @@ import { OrderItem } from './order-item.model';
 import { NotificationModule } from 'src/websockets/notification/notification.module';
 import { NotificationService } from 'src/websockets/notification/notification.service';
 import { NotificationGateway } from 'src/websockets/notification/notification.gateway';
-import { WsJwtMiddleware } from 'src/websockets/middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from 'src/middlewares/ws-jwt-middleware';
 import { OrderStats } from './order-stats.model';
 
 @Module({

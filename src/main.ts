@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Multer } from 'multer';
 import * as express from 'express';
-import { LoggerMiddleware } from './websockets/middlewares/logger.middleware';
+import { LoggerInterceptor } from './interceptors/logger.interceptor';
 
 const DEFAULT_API_PREFIX = 'api';
 
@@ -18,8 +18,11 @@ async function bootstrap() {
 
   app.use('/uploads', express.static('./uploads'));
 
-  const logger = new LoggerMiddleware();
-  app.use(logger.use.bind(logger));
+// 👇 Подключи interceptor
+app.useGlobalInterceptors(new LoggerInterceptor());
+    // 👇 Подключаем логгер
+    // const logger = new LoggerMiddleware();
+    // app.use(logger.use.bind(logger));
 
 
   const config = new DocumentBuilder()

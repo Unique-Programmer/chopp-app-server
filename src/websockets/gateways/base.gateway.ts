@@ -5,7 +5,7 @@ import {
 } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { WsJwtMiddleware } from '../middlewares/ws-jwt-middleware';
+import { WsJwtMiddleware } from '../../middlewares/ws-jwt-middleware';
 import { ActiveSessionService } from '../active-sessions/active-session.service';
 import { WS_MESSAGE_TYPE } from 'src/shared/enums';
 
