@@ -29,8 +29,8 @@ services:
       POSTGRES_DB: chopp
     volumes:
       - pgdata:/var/lib/postgresql/data
-    restart: always
-
+    # restart: always #чтобы отловить почему падает БД
+ 
   redis:
     container_name: redis
     image: redis:7-alpine
