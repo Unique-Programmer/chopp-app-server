@@ -63,6 +63,11 @@ console.log('process.env: ', process.env)
       username: process.env.POSTGRES_USER,
       password: process.env.POSTGRES_PASSWORD,
       database: process.env.POSTGRES_DB,
+      // logging: (sql, timing) => {
+      //   const short = sql.split('\n')[0]; // Обрезаем длинные SQL
+      //   console.log(`[DB] ${new Date().toISOString()} | ${short}${timing ? ` (${timing}ms)` : ''}`);
+      // },
+      // benchmark: true, // Показывает время выполнения
       models: [
         User,
         Role,
