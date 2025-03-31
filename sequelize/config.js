@@ -1,12 +1,13 @@
-require('dotenv').config({ path: `.env.${process.env.NODE_ENV}` });
+require('dotenv').config({ path: '.env.production' });
 
 module.exports = {
-  [process.env.NODE_ENV]: {
+  production: {
     username: process.env.POSTGRES_USER,
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DB,
     host: process.env.POSTGRES_HOST,
-    port: process.env.POSTGRES_PORT,
+    port: Number(process.env.POSTGRES_PORT),
     dialect: 'postgres',
+    logging: false
   }
 };
