@@ -18,6 +18,9 @@ services:
       postgres:
         condition: service_healthy
     restart: always
+    ports:
+    - "6000:6000"
+
 
   postgres:
     container_name: postgres
