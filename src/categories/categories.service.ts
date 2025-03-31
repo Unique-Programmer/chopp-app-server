@@ -18,6 +18,8 @@ export class CategoriesService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     const categories = await this.categoryModel.findAll();
     const categoriesNames = categories.map((item) => item.title);
 

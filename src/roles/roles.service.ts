@@ -17,6 +17,8 @@ export class RolesService implements OnModuleInit {
   constructor(@InjectModel(Role) private roleRepository: typeof Role) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     await this.ensureRole(1, 'ADMIN', 'Роль администратора');
     await this.ensureRole(2, 'USER', 'Роль пользвоателя');
   }

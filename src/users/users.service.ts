@@ -8,14 +8,18 @@ import { RolesService } from 'src/roles/roles.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from 'src/roles/roles.model';
 import { CreateAdminDto } from './dto/create-admin.dto';
+import { ShoppingCart } from 'src/shopping-cart/shopping-cart.model';
 
 @Injectable()
 export class UsersService {
+  
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Role) private roleRepository: typeof Role,
+    @InjectModel(ShoppingCart) private shoppingCartRepository: typeof ShoppingCart,
     private roleService: RolesService,
   ) {}
+  
 
   async createAdmin(
     createAdminDto: Omit<
@@ -45,13 +49,19 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto) {
-    console.log('----user 2: ', dto)
     const user = await this.userRepository.create(dto);
     const role = await this.roleService.getRoleByValue('USER');
-    // role creation after user is created
     user.roles = [role];
     await user.$set('roles', [role.id]);
-
+  
+    if (process.env.NODE_ENV === 'development') {
+      await this.shoppingCartRepository.create({
+        userId: user.id,
+        totalPrice: 0,
+        quantity: 0,
+      });
+    }
+  
     return user;
   }
 

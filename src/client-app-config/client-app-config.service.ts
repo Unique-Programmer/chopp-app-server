@@ -13,6 +13,8 @@ export class ClientAppConfigService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     const existingConfig = await this.clientAppModel.findByPk(1);
     if (!existingConfig) {
       await this.clientAppModel.create({ id: 1, freeDeliveryIncluded: false });

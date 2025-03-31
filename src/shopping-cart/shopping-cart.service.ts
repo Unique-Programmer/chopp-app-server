@@ -25,6 +25,8 @@ export class ShoppingCartService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    if (process.env.NODE_ENV !== 'development') return;
+
     const users = await this.userModel.findAll();
     const cartUserIds = (
       await this.shoppingCartModel.findAll({ attributes: ['userId'] })
