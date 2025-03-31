@@ -19,6 +19,8 @@ export class NotificationGateway extends BaseGateway  {
     jwtMiddleware: WsJwtMiddleware,
   ) {
     super(jwtMiddleware);
+
+    console.log('NotificationGateway----')
   }
 
   // Метод для отправки уведомления

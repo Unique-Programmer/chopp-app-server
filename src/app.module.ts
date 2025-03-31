@@ -40,6 +40,10 @@ import { TelegramModule } from './telegram/telegram.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import * as redisStore from 'cache-manager-redis-store';
 
+const isDev = process.env.NODE_ENV === 'development';
+const isProd = process.env.NODE_ENV === 'production';
+
+
 console.log('process.env: ', process.env)
 @Module({
   imports: [
@@ -68,6 +72,7 @@ console.log('process.env: ', process.env)
       //   console.log(`[DB] ${new Date().toISOString()} | ${short}${timing ? ` (${timing}ms)` : ''}`);
       // },
       // benchmark: true, // Показывает время выполнения
+      // logging: false, // Отключить в продакшне для повышения производительности
       models: [
         User,
         Role,
@@ -88,6 +93,8 @@ console.log('process.env: ', process.env)
         Subscription,
         OrderStats,
       ],
+      synchronize: isDev,
+      logging: !isProd,
       autoLoadModels: true,
     }),
     UsersModule,

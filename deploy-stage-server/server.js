@@ -91,7 +91,7 @@ app.post('/command', (req, res) => {
       command = ['bash', '-c', 'docker rmi $(docker images -q)'];
       break;
     case 'staging-up':
-      command = ['docker-compose', '-f', 'docker-compose.staging.yml', 'up', '-d', '--build'];
+      command = ['docker-compose', '-f', 'docker-compose.production.yml', 'up', '-d', '--build'];
       break;
     default:
       res.end('❌ Unknown command');

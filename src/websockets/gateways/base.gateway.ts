@@ -1,8 +1,4 @@
-import {
-  OnGatewayConnection,
-  OnGatewayDisconnect,
-  ConnectedSocket,
-} from '@nestjs/websockets';
+import { OnGatewayConnection, OnGatewayDisconnect, ConnectedSocket } from '@nestjs/websockets';
 import { Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { WsJwtMiddleware } from '../../middlewares/ws-jwt-middleware';
@@ -10,15 +6,16 @@ import { ActiveSessionService } from '../active-sessions/active-session.service'
 import { WS_MESSAGE_TYPE } from 'src/shared/enums';
 
 @Injectable() // Указываем, что базовый класс поддерживает DI
-export abstract class BaseGateway
-  implements OnGatewayConnection, OnGatewayDisconnect
-{
+export abstract class BaseGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly jwtMiddleware: WsJwtMiddleware,
     // private readonly activeSessionService: ActiveSessionService,
-  ) {} // DI для JwtMiddleware
+  ) {
+    console.log('BaseGateway-----')
+  } // DI для JwtMiddleware
 
   async handleConnection(@ConnectedSocket() client: Socket) {
+    console.log('client----')
     try {
       // Аутентификация пользователя
       const { payload: user, error } = this.jwtMiddleware.validate(client);
@@ -31,7 +28,7 @@ export abstract class BaseGateway
           //     //     timeStamp: new Date().valueOf(),
           //     //     payload: { sender: 'support' },
           //     //   });
-        })
+        });
       }
 
       client.data.user = user;

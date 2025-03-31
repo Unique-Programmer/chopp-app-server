@@ -37,8 +37,11 @@ npm install
 
 if [ "$project" = "backend" ]; then
   echo "🛠 Rebuilding backend containers..."
-  docker-compose down || true
-  docker-compose -f docker-compose.staging.yml up -d --build
+  docker-compose -f docker-compose.production.yml down || true
+  docker-compose -f docker-compose.production.yml up -d --build
+
+  echo "🗃 Running DB migrations..."
+  docker exec main npm run migrate:prod
 elif [ "$project" = "client" ]; then
   echo "🛠 Building client frontend..."
   npm run build-ignore-ts

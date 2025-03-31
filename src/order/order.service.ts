@@ -72,6 +72,8 @@ export class OrderService {
     returnUrl,
     comment,
     address,
+    phoneNumber,
+    name
   }: { userId: number } & CreateOrderDTO): Promise<CreatePaymentResponseDto> {
     const transaction = await this.orderModel.sequelize.transaction();
 
@@ -90,6 +92,8 @@ export class OrderService {
           quantity: cart.items.reduce((sum, item) => sum + item.quantity, 0),
           orderStatus: ORDER_STATUS.AWAITING_PAYMENT,
           paymentStatus: PAYMENT_STATUS.PENDING,
+          phoneNumber,
+          name
         },
         { transaction },
       );
