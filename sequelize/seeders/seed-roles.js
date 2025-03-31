@@ -2,22 +2,26 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.bulkInsert('roles', [
-      {
-        id: 1,
-        value: 'ADMIN',
-        description: 'Роль администратора',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        id: 2,
-        value: 'USER',
-        description: 'Роль пользователя',
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    ]);
+    await queryInterface.bulkInsert(
+      'roles',
+      [
+        {
+          id: 1,
+          value: 'ADMIN',
+          description: 'Роль администратора',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+        {
+          id: 2,
+          value: 'USER',
+          description: 'Роль пользователя',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ],
+      { ignoreDuplicates: true }
+    );
   },
 
   down: async (queryInterface, Sequelize) => {
