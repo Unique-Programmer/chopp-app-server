@@ -30,6 +30,8 @@ services:
       POSTGRES_DB: chopp
     volumes:
       - pgdata:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
