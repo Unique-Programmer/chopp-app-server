@@ -9,6 +9,7 @@ export class TelegramService implements OnModuleInit {
   private readonly logger = new Logger(TelegramService.name);
   private readonly botToken: string;
   private readonly apiUrl: string;
+  private codeMap: Record<string, string> = {};
 
   constructor(
     private readonly configService: ConfigService,
@@ -35,7 +36,7 @@ export class TelegramService implements OnModuleInit {
 
   private async startPolling() {
     let offset = 0;
-  
+
     const poll = async () => {
       const response = await lastValueFrom(
         this.httpService.get(`${this.apiUrl}/getUpdates`, {
@@ -65,6 +66,8 @@ export class TelegramService implements OnModuleInit {
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user.telegramUserId) {
+      const userKey = `verification:${phoneNumber}`;
+      this.codeMap[userKey] = code;
       this.logger.log('This user has not logged into the bot yet, we are waiting for him');
       return;
     }
@@ -74,10 +77,7 @@ export class TelegramService implements OnModuleInit {
       `🔑 <b>Ваш код подтверждения придет следующим сообщением</b>\n\n⏱️ Код действителен в течение 5 минут.\n\n🔒 <i>Никому не сообщайте этот код в целях безопасности.</i>`,
     );
 
-    await this.sendMessage(
-      user.telegramUserId,
-      `<code>${code}</code>`,
-    );
+    await this.sendMessage(user.telegramUserId, `<code>${code}</code>`);
   }
 
   async sendMessage(chatId: string, text: string): Promise<void> {
@@ -113,6 +113,12 @@ export class TelegramService implements OnModuleInit {
       chatId,
       '🎉 <b>Поздравляем!</b>\n\n📲 Ваш номер телефона успешно привязан к Telegram.\n\n🔐 Теперь вы можете использовать бота для безопасной авторизации в приложении Chopp.',
     );
+
+    if (this.codeMap[`verification:${phoneNumber}`]) {
+      const userCode = this.codeMap[`verification:${phoneNumber}`];
+      delete this.codeMap[`verification:${phoneNumber}`];
+      await this.sendCode(phoneNumber, userCode);
+    }
   }
 
   private async handleUpdate(update: any): Promise<void> {
