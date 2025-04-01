@@ -14,9 +14,9 @@ import { NotificationService } from 'src/websockets/notification/notification.se
 import { PAYMENT_STATUS, WS_MESSAGE_TYPE } from 'src/shared/enums/';
 import { User } from 'src/users/users.model';
 import { AxiosRequestConfig } from 'axios';
-import axios from 'axios';
-import http from 'http';
-import https from 'https';
+const axios = require('axios');
+const http = require('http');
+const https = require('https');
 
 
 @Injectable()

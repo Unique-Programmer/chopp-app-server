@@ -34,10 +34,9 @@ services:
     container_name: postgres-exporter
     environment:
       DATA_SOURCE_NAME: "postgresql://postgres:postgres@localhost:5432/chopp?sslmode=disable"
-    ports:
-      - "9187:9187"
     network_mode: host
     restart: always
+
 
 volumes:
   grafana-data:

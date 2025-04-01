@@ -3,9 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { UsersService } from '../users/users.service';
-import axios from 'axios';
-import http from 'http';
-import https from 'https';
+const axios = require('axios');
+const http = require('http');
+const https = require('https');
+
 
 
 @Injectable()
