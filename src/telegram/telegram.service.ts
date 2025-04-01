@@ -3,6 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { UsersService } from '../users/users.service';
+import axios from 'axios';
+import http from 'http';
+import https from 'https';
+
 
 @Injectable()
 export class TelegramService implements OnModuleInit {
@@ -18,6 +22,14 @@ export class TelegramService implements OnModuleInit {
   ) {
     this.botToken = this.configService.get<string>('TELEGRAM_BOT_TOKEN');
     this.apiUrl = `https://api.telegram.org/bot${this.botToken}`;
+
+    // 🛠 Создаём кастомный axios instance с отключённым keep-alive
+    const axiosInstance = axios.create({
+      httpAgent: new http.Agent({ keepAlive: false }),
+      httpsAgent: new https.Agent({ keepAlive: false }),
+    });
+
+    this.httpService = new HttpService(axiosInstance);
   }
 
   async onModuleInit() {
@@ -38,26 +50,35 @@ export class TelegramService implements OnModuleInit {
     let offset = 0;
 
     const poll = async () => {
-      const response = await lastValueFrom(
-        this.httpService.get(`${this.apiUrl}/getUpdates`, {
-          params: {
-            offset,
-            timeout: 30,
-            allowed_updates: JSON.stringify(['message']),
-          },
-        }),
-      );
-
-      const updates = response.data.result;
-      if (updates && updates.length > 0) {
-        for (const update of updates) {
-          await this.handleUpdate(update);
-          offset = update.update_id + 1;
+      try {
+        const response = await lastValueFrom(
+          this.httpService.get(`${this.apiUrl}/getUpdates`, {
+            params: {
+              offset,
+              timeout: 30,
+              allowed_updates: JSON.stringify(['message']),
+            },
+            timeout: 35000, // чуть больше, чтобы не зависало
+          }),
+        );
+    
+        const updates = response.data.result;
+        if (updates?.length > 0) {
+          for (const update of updates) {
+            await this.handleUpdate(update);
+            offset = update.update_id + 1;
+          }
         }
+      } catch (error) {
+        this.logger.error('Ошибка Telegram polling:', {
+          message: error.message,
+          code: error.code,
+        });
+      } finally {
+        setTimeout(poll, 1000);
       }
-
-      setTimeout(poll, 1000);
     };
+    
 
     poll();
   }

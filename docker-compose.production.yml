@@ -19,6 +19,11 @@ services:
         condition: service_healthy
     restart: always
     network_mode: host
+    healthcheck:
+      test: ["CMD", "sh", "-c", "pg_isready -U postgres -d chopp"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
 
 
   postgres:

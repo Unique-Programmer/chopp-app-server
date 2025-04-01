@@ -11,11 +11,9 @@ export abstract class BaseGateway implements OnGatewayConnection, OnGatewayDisco
     private readonly jwtMiddleware: WsJwtMiddleware,
     // private readonly activeSessionService: ActiveSessionService,
   ) {
-    console.log('BaseGateway-----')
   } // DI для JwtMiddleware
 
   async handleConnection(@ConnectedSocket() client: Socket) {
-    console.log('client----')
     try {
       // Аутентификация пользователя
       const { payload: user, error } = this.jwtMiddleware.validate(client);

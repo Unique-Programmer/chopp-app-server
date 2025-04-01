@@ -13,8 +13,11 @@ import { YooKassaWebhookService } from './yookassa-webhook.service';
 import { NotificationService } from 'src/websockets/notification/notification.service';
 import { PAYMENT_STATUS, WS_MESSAGE_TYPE } from 'src/shared/enums/';
 import { User } from 'src/users/users.model';
-import qs from 'qs';
 import { AxiosRequestConfig } from 'axios';
+import axios from 'axios';
+import http from 'http';
+import https from 'https';
+
 
 @Injectable()
 export class PaymentsService {
@@ -23,7 +26,14 @@ export class PaymentsService {
     private readonly httpService: HttpService,
     private readonly subscriptionService: YooKassaWebhookService,
     private readonly notificationService: NotificationService,
-  ) {}
+  ) {
+    const axiosInstance = axios.create({
+      httpAgent: new http.Agent({ keepAlive: false }),
+      httpsAgent: new https.Agent({ keepAlive: false }),
+    });
+
+    this.httpService = new HttpService(axiosInstance);
+  }
 
   private getAuthHeader(): string {
     const shopId = process.env.YOOKASSA_SHOP_ID;
@@ -105,7 +115,7 @@ export class PaymentsService {
         config.data = data;
       }
   
-      // 🧪 Отладка
+      // 🧪 Отладка запроса
       console.log('🌐 Запрос:', {
         url,
         method,
@@ -119,19 +129,40 @@ export class PaymentsService {
       console.log('✅ Ответ:', response.status, response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Ошибка запроса:', {
-        message: error.message,
-        code: error.code,
-        url,
-        method,
-        headers,
-      });
+      // 🛑 Специальная обработка socket hang up / сетевых ошибок
+      const isSocketError = [
+        'ECONNRESET',
+        'EPIPE',
+        'ETIMEDOUT',
+        'ENOTFOUND',
+        'ECONNREFUSED',
+      ].includes(error.code) || error.message === 'socket hang up';
+  
+      if (isSocketError) {
+        console.error('❗️Сетевая ошибка при HTTP-запросе:', {
+          url,
+          method,
+          message: error.message,
+          code: error.code,
+        });
+  
+        // Здесь можно сделать retry, лог в телегу, метрику в мониторинг и т.д.
+      } else {
+        console.error('❌ Ошибка запроса:', {
+          message: error.message,
+          code: error.code,
+          url,
+          method,
+          headers,
+        });
+      }
   
       throw new NotFoundException(
         error.response?.data || 'Unexpected error occurred',
       );
     }
   }
+  
   
 
   async createPayment({
