@@ -56,8 +56,14 @@ if [ "$project" = "backend" ]; then
     docker exec -i postgres psql -U postgres -c "CREATE DATABASE chopp;"
   fi
 
+  echo "⌛ Ожидаем, пока контейнер main поднимется..."
+  until [ "$(docker inspect -f '{{.State.Running}}' main 2>/dev/null)" = "true" ]; do
+    sleep 1
+  done
+
   echo "🗃 Running DB migrations..."
   docker exec main npm run migrate:prod
+
 
 elif [ "$project" = "client" ]; then
   echo "🛠 Building client frontend..."
