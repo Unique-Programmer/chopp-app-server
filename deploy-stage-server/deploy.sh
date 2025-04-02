@@ -31,6 +31,10 @@ echo "🔄 Pulling latest changes from $branch..."
 git fetch origin
 git checkout "$branch" || git checkout -b "$branch" origin/"$branch"
 git pull origin "$branch"
+echo "♻️ Сброс init-db.sh до версии из репозитория..."
+git checkout -- init-db.sh
+
+echo "🔓 Делаем init-db.sh исполняемым..."
 chmod +x init-db.sh
 
 echo "📦 Installing dependencies..."
