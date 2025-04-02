@@ -94,7 +94,7 @@ console.log('process.env: ', process.env)
         OrderStats,
       ],
       synchronize: isDev,
-      logging: !isProd,
+      // logging: !isProd,
       autoLoadModels: true,
     }),
     UsersModule,
