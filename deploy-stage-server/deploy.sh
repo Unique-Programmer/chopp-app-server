@@ -39,7 +39,14 @@ npm install
 if [ "$project" = "backend" ]; then
   echo "🛠 Rebuilding backend containers..."
   docker-compose -f docker-compose.production.yml down || true
-  docker-compose -f docker-compose.production.yml up -d --build
+  docker-compose -f docker-compose.production.yml up -d --build postgres
+
+  echo "🔍 Проверка наличия базы chopp..."
+  docker exec -it postgres psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'chopp'" | grep -q 1 || \
+  docker exec -it postgres psql -U postgres -c "CREATE DATABASE chopp;"
+
+  echo "🚀 Поднимаем main и применяем миграции..."
+  docker-compose -f docker-compose.production.yml up -d --build main
 
   echo "🗃 Running DB migrations..."
   docker exec main npm run migrate:prod
