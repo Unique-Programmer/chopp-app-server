@@ -10,10 +10,7 @@ services:
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
-    command: sh -c "
-      npm run migrate:prod &&
-      npx sequelize-cli db:seed:all &&
-      npm run start:prod"
+    command: sh /app/init-db.sh
     depends_on:
       postgres:
         condition: service_healthy

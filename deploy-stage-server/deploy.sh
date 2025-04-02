@@ -31,6 +31,7 @@ echo "🔄 Pulling latest changes from $branch..."
 git fetch origin
 git checkout "$branch" || git checkout -b "$branch" origin/"$branch"
 git pull origin "$branch"
+chmod +x init-db.sh
 
 echo "📦 Installing dependencies..."
 npm install
