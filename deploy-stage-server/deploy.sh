@@ -42,8 +42,8 @@ if [ "$project" = "backend" ]; then
   docker-compose -f docker-compose.production.yml up -d --build postgres
 
   echo "🔍 Проверка наличия базы chopp..."
-  docker exec postgres psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'chopp'" | grep -q 1 || \
-  docker exec postgres psql -U postgres -c "CREATE DATABASE chopp;"
+  docker exec -i postgres psql -U postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'chopp'" | grep -q 1 || \
+  docker exec -i postgres psql -U postgres -c "CREATE DATABASE chopp;"
 
   echo "🚀 Поднимаем main и применяем миграции..."
   docker-compose -f docker-compose.production.yml up -d --build main
