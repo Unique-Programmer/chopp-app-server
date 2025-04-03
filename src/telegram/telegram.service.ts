@@ -7,8 +7,6 @@ const axios = require('axios');
 const http = require('http');
 const https = require('https');
 
-
-
 @Injectable()
 export class TelegramService implements OnModuleInit {
   private readonly logger = new Logger(TelegramService.name);
@@ -62,7 +60,7 @@ export class TelegramService implements OnModuleInit {
             timeout: 35000, // чуть больше, чтобы не зависало
           }),
         );
-    
+
         const updates = response.data.result;
         if (updates?.length > 0) {
           for (const update of updates) {
@@ -79,21 +77,24 @@ export class TelegramService implements OnModuleInit {
         setTimeout(poll, 1000);
       }
     };
-    
 
     poll();
   }
 
   async sendCode(phoneNumber: string, code: string): Promise<void> {
+    this.logger.log(`Sending code ${code} to ${phoneNumber}`);
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user.telegramUserId) {
+      this.logger.log(`User ${phoneNumber} not found in Telegram`);
       const userKey = `verification:${phoneNumber}`;
       this.codeMap[userKey] = code;
       this.logger.log('This user has not logged into the bot yet, we are waiting for him');
       return;
     }
 
+    this.logger.log(`User ${phoneNumber} found in Telegram`);
+    this.logger.log(`Sending code ${code} to user ${user.telegramUserId}`);
     await this.sendMessage(
       user.telegramUserId,
       `🔑 <b>Ваш код подтверждения придет следующим сообщением</b>\n\n⏱️ Код действителен в течение 5 минут.\n\n🔒 <i>Никому не сообщайте этот код в целях безопасности.</i>`,
@@ -103,6 +104,7 @@ export class TelegramService implements OnModuleInit {
   }
 
   async sendMessage(chatId: string, text: string): Promise<void> {
+    this.logger.log(`Sending message to ${chatId}: ${text}`);
     await lastValueFrom(
       this.httpService.post(`${this.apiUrl}/sendMessage`, {
         chat_id: chatId,
@@ -113,8 +115,10 @@ export class TelegramService implements OnModuleInit {
   }
 
   async sendContact(chatId: string, phoneNumber: string): Promise<void> {
+    this.logger.log(`Sending contact to ${chatId}: ${phoneNumber}`);
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
     if (!user) {
+      this.logger.log(`User ${phoneNumber} not found`);
       await this.sendMessage(
         chatId,
         '❌ <b>Пользователь не найден!</b>\n\nВозможные причины:\n• Номер телефона еще не внесен в систему\n• Неверный формат номера\n\n📲 Пожалуйста, нажмите "Войти" или добавьте товары в корзину в приложении Chopp [ссылка].',
@@ -123,6 +127,7 @@ export class TelegramService implements OnModuleInit {
     }
 
     if (user.telegramUserId) {
+      this.logger.log(`User ${phoneNumber} already has Telegram ID`);
       await this.sendMessage(
         chatId,
         '⚠️ <b>Внимание!</b>\n\nВы уже привязали этот номер телефона к Telegram.\n\nВаш аккаунт уже готов к использованию.',
@@ -130,13 +135,15 @@ export class TelegramService implements OnModuleInit {
       return;
     }
 
+    this.logger.log(`User ${phoneNumber} found, updating Telegram ID`);
     await user.update({ telegramUserId: chatId });
     await this.sendMessage(
       chatId,
       '🎉 <b>Поздравляем!</b>\n\n📲 Ваш номер телефона успешно привязан к Telegram.\n\n🔐 Теперь вы можете использовать бота для безопасной авторизации в приложении Chopp.',
     );
-
+    this.logger.log(`User ${phoneNumber} updated with Telegram ID ${chatId}`);
     if (this.codeMap[`verification:${phoneNumber}`]) {
+      this.logger.log(`Sending verification code to ${phoneNumber}`);
       const userCode = this.codeMap[`verification:${phoneNumber}`];
       delete this.codeMap[`verification:${phoneNumber}`];
       await this.sendCode(phoneNumber, userCode);
@@ -144,7 +151,9 @@ export class TelegramService implements OnModuleInit {
   }
 
   private async handleUpdate(update: any): Promise<void> {
+    this.logger.log('Received update:', update);
     if (update.message?.contact) {
+      this.logger.log('Received contact:', update.message.contact);
       const chatId = update.message.chat.id.toString();
       const phoneNumber = update.message.contact.phone_number;
       await lastValueFrom(
@@ -161,6 +170,7 @@ export class TelegramService implements OnModuleInit {
     }
 
     if (update.message && update.message.text) {
+      this.logger.log('Received message:', update.message.text);
       const chatId = update.message.chat.id.toString();
       const text = update.message.text;
 
