@@ -10,7 +10,7 @@ services:
     volumes:
       - .:/app
       - ./node_modules:/app/node_modules
-    command: sh /app/init-db.sh
+    # command: sh /app/init-db.sh - не отрабатывает? нет папки app
     depends_on:
       postgres:
         condition: service_healthy

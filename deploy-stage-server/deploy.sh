@@ -6,8 +6,8 @@ project=$1
 branch=$2
 start_time=$(date +%s)
 
-echo "📁 Project: $project"
-echo "🌿 Branch: $branch"
+echo "📁 Проект: $project"
+echo "🌿 Ветка: $branch"
 
 case "$project" in
   backend)
@@ -20,13 +20,13 @@ case "$project" in
     repo_dir="/home/vlad/app-frontend-admin/chopp-app-admin"
     ;;
   *)
-    echo "❌ Unknown project: $project"
+    echo "❌ Неизвестный проект: $project"
     exit 1
     ;;
 esac
 
 cd "$repo_dir"
-echo "🔄 Pulling latest changes from $branch..."
+echo "🔄 Скачиваем последние изменения ветки $branch..."
 
 git fetch origin
 git checkout "$branch" || git checkout -b "$branch" origin/"$branch"
@@ -37,11 +37,11 @@ git checkout -- init-db.sh
 echo "🔓 Делаем init-db.sh исполняемым..."
 chmod +x init-db.sh
 
-echo "📦 Installing dependencies..."
+echo "📦 Устанавливаем зависимости..."
 npm install
 
 if [ "$project" = "backend" ]; then
-  echo "🛠 Rebuilding backend containers..."
+  echo "🛠 Пересобираем backend контейнеры..."
   docker-compose -f docker-compose.production.yml down || true
   docker-compose -f docker-compose.production.yml up -d --build
 
@@ -65,18 +65,18 @@ if [ "$project" = "backend" ]; then
     sleep 1
   done
 
-  echo "🗃 Running DB migrations..."
+  echo "🗃 Запускаем миграции DB..."
   docker exec main npm run migrate:prod
 
 
 elif [ "$project" = "client" ]; then
-  echo "🛠 Building client frontend..."
+  echo "🛠 Собираем client frontend..."
   npm run build-ignore-ts
   sudo rm -rf /var/www/frontend-client/*
   sudo cp -r dist/* /var/www/frontend-client/
 
 elif [ "$project" = "admin" ]; then
-  echo "🛠 Building admin panel..."
+  echo "🛠 Собираем admin panel..."
   npm run build-ignore-ts
   sudo rm -rf /var/www/frontend-admin/*
   sudo cp -r dist/* /var/www/frontend-admin/
@@ -84,4 +84,4 @@ fi
 
 end_time=$(date +%s)
 duration=$((end_time - start_time))
-echo "✅ Deploy complete for $project:$branch in ${duration}s"
+echo "✅ Деплой ветки $project:$branch занял ${duration}s"

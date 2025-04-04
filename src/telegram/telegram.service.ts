@@ -32,8 +32,6 @@ export class TelegramService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    if (process.env.NODE_ENV !== 'development') return;
-
     this.logger.log('Telegram bot initializing...');
 
     if (!this.botToken) {
