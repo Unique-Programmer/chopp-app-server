@@ -21,47 +21,47 @@ export class FileCleanupService {
     timeZone: 'Europe/Moscow',
   })
   async cleanupUnusedFiles() {
-    this.logger.log('Starting cleanup of unused image files...');
+    // this.logger.log('Starting cleanup of unused image files...');
 
-    const usedFileIds = await this.productFileModel.findAll({
-      attributes: ['fileId'],
-      raw: true,
-    });
+    // const usedFileIds = await this.productFileModel.findAll({
+    //   attributes: ['fileId'],
+    //   raw: true,
+    // });
 
-    const fileIdsInUse = usedFileIds.map((item) => item.fileId);
+    // const fileIdsInUse = usedFileIds.map((item) => item.fileId);
 
-    const unusedFiles = await this.fileModel.findAll({
-      where: {
-        id: {
-          [Op.notIn]: fileIdsInUse.length ? fileIdsInUse : [0],
-        },
-      },
-      raw: true,
-    });
+    // const unusedFiles = await this.fileModel.findAll({
+    //   where: {
+    //     id: {
+    //       [Op.notIn]: fileIdsInUse.length ? fileIdsInUse : [0],
+    //     },
+    //   },
+    //   raw: true,
+    // });
 
-    this.logger.log(`Found ${unusedFiles.length} unused files to delete`);
+    // this.logger.log(`Found ${unusedFiles.length} unused files to delete`);
 
-    for (const file of unusedFiles) {
-      try {
-        const filePath = path.join(process.cwd(), file.path);
+    // for (const file of unusedFiles) {
+    //   try {
+    //     const filePath = path.join(process.cwd(), file.path);
 
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          this.logger.log(`Deleted file from disk: ${filePath}`);
-        } else {
-          this.logger.warn(`File not found on disk: ${filePath}`);
-        }
+    //     if (fs.existsSync(filePath)) {
+    //       fs.unlinkSync(filePath);
+    //       this.logger.log(`Deleted file from disk: ${filePath}`);
+    //     } else {
+    //       this.logger.warn(`File not found on disk: ${filePath}`);
+    //     }
 
-        await this.fileModel.destroy({
-          where: {
-            id: file.id,
-          },
-        });
-      } catch (error) {
-        this.logger.error(`Error deleting file ${file.id}: ${error.message}`);
-      }
-    }
+    //     await this.fileModel.destroy({
+    //       where: {
+    //         id: file.id,
+    //       },
+    //     });
+    //   } catch (error) {
+    //     this.logger.error(`Error deleting file ${file.id}: ${error.message}`);
+    //   }
+    // }
 
-    this.logger.log('Cleanup completed');
+    // this.logger.log('Cleanup completed');
   }
 }
