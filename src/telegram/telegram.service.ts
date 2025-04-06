@@ -3,6 +3,8 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { UsersService } from '../users/users.service';
+import { formatPhoneNumber } from 'src/shared/utils/phone-format.utils';
+
 const axios = require('axios');
 const http = require('http');
 const https = require('https');
@@ -153,7 +155,8 @@ export class TelegramService implements OnModuleInit {
     if (update.message?.contact) {
       this.logger.log('🤖 Received contact:', update.message.contact);
       const chatId = update.message.chat.id.toString();
-      const phoneNumber = update.message.contact.phone_number;
+      let phoneNumber = update.message.contact.phone_number;
+      phoneNumber = formatPhoneNumber(phoneNumber);
       await lastValueFrom(
         this.httpService.post(`${this.apiUrl}/sendMessage`, {
           chat_id: chatId,

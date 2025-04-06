@@ -9,24 +9,17 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Role } from 'src/roles/roles.model';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { ShoppingCart } from 'src/shopping-cart/shopping-cart.model';
-
+import { formatPhoneNumber } from 'src/shared/utils/phone-format.utils';
 @Injectable()
 export class UsersService {
-  
   constructor(
     @InjectModel(User) private userRepository: typeof User,
     @InjectModel(Role) private roleRepository: typeof Role,
     @InjectModel(ShoppingCart) private shoppingCartRepository: typeof ShoppingCart,
     private roleService: RolesService,
   ) {}
-  
 
-  async createAdmin(
-    createAdminDto: Omit<
-      CreateAdminDto,
-      'superadminLogin' | 'superadminPassword'
-    >,
-  ): Promise<User> {
+  async createAdmin(createAdminDto: Omit<CreateAdminDto, 'superadminLogin' | 'superadminPassword'>): Promise<User> {
     const { adminLogin, adminPassword } = createAdminDto;
 
     const hashedPassword = await bcrypt.hash(adminPassword, 10);
@@ -49,11 +42,15 @@ export class UsersService {
   }
 
   async createUser(dto: CreateUserDto) {
-    const user = await this.userRepository.create(dto);
+    const formattedDto = {
+      ...dto,
+      phoneNumber: dto.phoneNumber ? formatPhoneNumber(dto.phoneNumber) : dto.phoneNumber,
+    };
+    const user = await this.userRepository.create(formattedDto);
     const role = await this.roleService.getRoleByValue('USER');
     user.roles = [role];
     await user.$set('roles', [role.id]);
-  
+
     if (process.env.NODE_ENV === 'development') {
       await this.shoppingCartRepository.create({
         userId: user.id,
@@ -61,7 +58,7 @@ export class UsersService {
         quantity: 0,
       });
     }
-  
+
     return user;
   }
 
@@ -71,10 +68,7 @@ export class UsersService {
       const candidate = await this.getUserByFieldName(payload?.email, 'email');
 
       if (candidate) {
-        throw new HttpException(
-          'User with this email already exist',
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException('User with this email already exist', HttpStatus.BAD_REQUEST);
       }
 
       userModel.update({ email: payload.email });
@@ -87,48 +81,31 @@ export class UsersService {
       userModel.update({ fullName: payload.fullName });
     }
     if (payload?.phoneNumber) {
-      userModel.update({ phoneNumber: payload.phoneNumber });
+      let userPhone = payload.phoneNumber;
+      userPhone = formatPhoneNumber(userPhone);
+      userModel.update({ phoneNumber: userPhone });
     }
 
     return userModel;
   }
 
-  async updateCurrentUser(
-    payload: UpdateUserDto,
-    userModel: User,
-  ): Promise<User> {
+  async updateCurrentUser(payload: UpdateUserDto, userModel: User): Promise<User> {
     // Проверяем и обновляем email, если он предоставлен и отличается от текущего
     if (payload?.email && payload.email !== userModel.email) {
-      if (
-        await this.isFieldTakenByAnotherUser(
-          payload.email,
-          'email',
-          userModel.id,
-        )
-      ) {
-        throw new HttpException(
-          'User with this email already exists',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (await this.isFieldTakenByAnotherUser(payload.email, 'email', userModel.id)) {
+        throw new HttpException('User with this email already exists', HttpStatus.BAD_REQUEST);
       }
       userModel.email = payload.email;
     }
 
     // Проверяем и обновляем phoneNumber, если он предоставлен и отличается от текущего
     if (payload?.phoneNumber && payload.phoneNumber !== userModel.phoneNumber) {
-      if (
-        await this.isFieldTakenByAnotherUser(
-          payload.phoneNumber,
-          'phoneNumber',
-          userModel.id,
-        )
-      ) {
-        throw new HttpException(
-          'User with this phone number already exists',
-          HttpStatus.BAD_REQUEST,
-        );
+      if (await this.isFieldTakenByAnotherUser(payload.phoneNumber, 'phoneNumber', userModel.id)) {
+        throw new HttpException('User with this phone number already exists', HttpStatus.BAD_REQUEST);
       }
-      userModel.phoneNumber = payload.phoneNumber;
+      let userPhone = payload.phoneNumber;
+      userPhone = formatPhoneNumber(userPhone);
+      userModel.phoneNumber = userPhone;
     }
 
     // Обновляем пароль, если он предоставлен
@@ -158,26 +135,26 @@ export class UsersService {
     requesterId = null,
   ) {
     try {
-    const offset = (page - 1) * limit;
+      const offset = (page - 1) * limit;
 
-    const sortParam = sort === 'date' ? 'createdAt' : sort;
+      const sortParam = sort === 'date' ? 'createdAt' : sort;
 
-    const where = {
-      ...(search && {
-        [Op.or]: [
-          { fullName: { [Op.iLike]: `%${search}%` } },
-          { email: { [Op.iLike]: `%${search}%` } },
-          { phoneNumber: { [Op.iLike]: `%${search}%` } },
-        ],
-      }),
-      ...(!isRequesterIncluded && {
-        id: {
-        [Op.ne]: requesterId, // exclude user who makes request
-      }}),
-    };
+      const where = {
+        ...(search && {
+          [Op.or]: [
+            { fullName: { [Op.iLike]: `%${search}%` } },
+            { email: { [Op.iLike]: `%${search}%` } },
+            { phoneNumber: { [Op.iLike]: `%${search}%` } },
+          ],
+        }),
+        ...(!isRequesterIncluded && {
+          id: {
+            [Op.ne]: requesterId, // exclude user who makes request
+          },
+        }),
+      };
 
-    const { rows: users, count: totalUsers } =
-      await this.userRepository.findAndCountAll({
+      const { rows: users, count: totalUsers } = await this.userRepository.findAndCountAll({
         where,
         limit: +limit,
         offset,
@@ -187,27 +164,20 @@ export class UsersService {
         attributes: { exclude: ['password'] },
       });
 
-    const totalPages = Math.ceil(totalUsers / limit);
+      const totalPages = Math.ceil(totalUsers / limit);
 
-    return {
-      items: users,
-      totalRecords: totalUsers,
-      totalPages,
-      page: Number(page),
-    };
+      return {
+        items: users,
+        totalRecords: totalUsers,
+        totalPages,
+        page: Number(page),
+      };
     } catch (e) {
-      throw new HttpException(
-        'Params is not correct',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException('Params is not correct', HttpStatus.BAD_REQUEST);
     }
   }
 
-  async getUserByFieldName(
-    fieldValue: string | number,
-    fieldName: string,
-    withPassword: boolean = false,
-  ) {
+  async getUserByFieldName(fieldValue: string | number, fieldName: string, withPassword: boolean = false) {
     const where = {
       [fieldName]: fieldValue,
     };
@@ -236,11 +206,7 @@ export class UsersService {
     });
   }
 
-  private async isFieldTakenByAnotherUser(
-    value: string,
-    fieldName: string,
-    currentUserId: number,
-  ): Promise<boolean> {
+  private async isFieldTakenByAnotherUser(value: string, fieldName: string, currentUserId: number): Promise<boolean> {
     const user = await this.userRepository.findOne({
       where: {
         [fieldName]: value,

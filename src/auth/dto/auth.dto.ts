@@ -15,7 +15,7 @@ export class AuthDto {
   readonly phoneNumber: string;
 
   @ApiProperty({
-    example: 'email@gmail.com or use phone number value',
+    example: 'email@gmail.com',
     description: 'unique phone number',
   })
   @IsOptional()
