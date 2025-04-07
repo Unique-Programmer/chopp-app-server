@@ -56,7 +56,7 @@ export class ActiveSessionService {
 
   @Cron(CronExpression.EVERY_HOUR) // Используем стандартное выражение
   async handleCleanStaleSessionsCron() {
-    this.logger.warn('Running scheduled cleanup for stale websocket sessions...');
-    await this.cleanStaleSessions();
+    // this.logger.warn('Running scheduled cleanup for stale websocket sessions...');
+    // await this.cleanStaleSessions();
   }
 }
