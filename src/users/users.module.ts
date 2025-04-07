@@ -17,7 +17,7 @@ import { ShoppingCart } from 'src/shopping-cart/shopping-cart.model';
     SequelizeModule.forFeature([User, Role, UserRoles, ShoppingCart]),
     RolesModule,
     forwardRef(() => AuthModule),
-    forwardRef(() => TelegramModule),
+    // forwardRef(() => TelegramModule),
   ],
   exports: [UsersService],
 })

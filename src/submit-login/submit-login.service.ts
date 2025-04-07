@@ -6,12 +6,12 @@ import { Cache } from 'cache-manager';
 @Injectable()
 export class SubmitLoginService {
   constructor(
-    private readonly telegramService: TelegramService,
+    // private readonly telegramService: TelegramService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   async sendVerificationCode(phoneNumber: string, code: string): Promise<void> {
     await this.cacheManager.set(`verification:${phoneNumber}`, code, 300); // 5 минут
-    await this.telegramService.sendCode(phoneNumber, code);
+    // await this.telegramService.sendCode(phoneNumber, code);
   }
 }

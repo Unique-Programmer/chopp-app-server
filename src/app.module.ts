@@ -113,7 +113,7 @@ console.log('process.env: ', process.env)
     AnalyticsModule,
     FileCleanupModule,
     ScheduleModule.forRoot(),
-    TelegramModule,
+    // TelegramModule,
     SubmitLoginModule,
   ],
   controllers: [],

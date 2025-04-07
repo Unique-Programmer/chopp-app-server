@@ -3,7 +3,7 @@ import { SubmitLoginService } from './submit-login.service';
 import { TelegramModule } from '../telegram/telegram.module';
 
 @Module({
-  imports: [TelegramModule],
+  // imports: [TelegramModule],
   providers: [SubmitLoginService],
   exports: [SubmitLoginService],
 })
