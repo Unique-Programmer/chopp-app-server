@@ -31,16 +31,17 @@ echo "🔄 Скачиваем последние изменения ветки $
 git fetch origin
 git checkout "$branch" || git checkout -b "$branch" origin/"$branch"
 git pull origin "$branch"
-echo "♻️ Сброс init-db.sh до версии из репозитория..."
-git checkout -- init-db.sh
-
-echo "🔓 Делаем init-db.sh исполняемым..."
-chmod +x init-db.sh
 
 echo "📦 Устанавливаем зависимости..."
 npm install
 
 if [ "$project" = "backend" ]; then
+  echo "♻️ Сброс init-db.sh до версии из репозитория..."
+  git checkout -- init-db.sh
+  
+  echo "🔓 Делаем init-db.sh исполняемым..."
+  chmod +x init-db.sh
+
   echo "🛠 Пересобираем backend контейнеры..."
   docker-compose -f docker-compose.production.yml down || true
   docker-compose -f docker-compose.production.yml up -d --build
