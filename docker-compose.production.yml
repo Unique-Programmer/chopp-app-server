@@ -33,9 +33,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: chopp
     volumes:
-      # - pgdata:/var/lib/postgresql/data
-      - /home/vlad/db-data:/var/lib/postgresql/data
-
+      - pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s

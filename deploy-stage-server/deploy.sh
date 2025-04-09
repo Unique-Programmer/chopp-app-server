@@ -40,6 +40,19 @@ chmod +x init-db.sh
 echo "📦 Устанавливаем зависимости..."
 npm install
 
+# 🧠 Логирование памяти
+if [ "$project" = "backend" ]; then
+  echo "📊 Настраиваем мониторинг ОЗУ..."
+  chmod +x log-memory.sh
+
+  if ! pgrep -f "log-memory.sh" > /dev/null; then
+    nohup ./log-memory.sh > /dev/null 2>&1 &
+    echo "🧠 Мониторинг памяти запущен в фоне."
+  else
+    echo "✅ Мониторинг памяти уже запущен."
+  fi
+fi
+
 if [ "$project" = "backend" ]; then
   echo "🛠 Пересобираем backend контейнеры..."
   docker-compose -f docker-compose.production.yml down || true
@@ -67,7 +80,6 @@ if [ "$project" = "backend" ]; then
 
   echo "🗃 Запускаем миграции DB..."
   docker exec main npm run migrate:prod
-
 
 elif [ "$project" = "client" ]; then
   echo "🛠 Собираем client frontend..."
