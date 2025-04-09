@@ -129,7 +129,7 @@ app.get('/logs/main', (req, res) => {
 });
 
 app.get('/logs/memory', (req, res) => {
-  const memoryLogs = spawn('bash', ['-c', 'watch -n 1 free -h']);
+  const memoryLogs = spawn('bash', ['-c', 'while true; do echo "$(date)"; free -h; echo ""; sleep 5; done']);
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
 
   memoryLogs.stdout.pipe(res);
@@ -139,6 +139,7 @@ app.get('/logs/memory', (req, res) => {
     memoryLogs.kill();
   });
 });
+
 
 app.listen(PORT, () => {
   console.log(`✅ Deploy panel running at http://localhost:${PORT}`);
