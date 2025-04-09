@@ -128,6 +128,19 @@ app.get('/logs/main', (req, res) => {
   });
 });
 
+app.get('/logs/memory', (req, res) => {
+  const memoryLogPath = path.join(__dirname, 'logs/memory.log');
+  const readStream = fs.createReadStream(memoryLogPath, { encoding: 'utf8' });
+
+  readStream.on('error', (err) => {
+    res.writeHead(500, { 'Content-Type': 'text/plain' });
+    res.end(`Ошибка при чтении логов памяти: ${err.message}`);
+  });
+
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+  readStream.pipe(res);
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Deploy panel running at http://localhost:${PORT}`);
 });
