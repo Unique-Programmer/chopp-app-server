@@ -117,28 +117,41 @@ app.post('/command', (req, res) => {
 });
 
 app.get('/logs/main', (req, res) => {
+  const logStream = fs.createWriteStream(path.join(__dirname, 'logs/main.log'), { flags: 'a' });
   const dockerLogs = spawn('docker', ['logs', '-f', 'main']);
+  
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
 
   dockerLogs.stdout.pipe(res);
+  dockerLogs.stdout.pipe(logStream);
+
   dockerLogs.stderr.pipe(res);
+  dockerLogs.stderr.pipe(logStream);
 
   req.on('close', () => {
     dockerLogs.kill();
+    logStream.end();
   });
 });
 
 app.get('/logs/memory', (req, res) => {
+  const logStream = fs.createWriteStream(path.join(__dirname, 'logs/memory.log'), { flags: 'a' });
   const memoryLogs = spawn('bash', ['-c', 'while true; do echo "$(date)"; free -h; echo ""; sleep 5; done']);
+  
   res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
 
   memoryLogs.stdout.pipe(res);
+  memoryLogs.stdout.pipe(logStream);
+
   memoryLogs.stderr.pipe(res);
+  memoryLogs.stderr.pipe(logStream);
 
   req.on('close', () => {
     memoryLogs.kill();
+    logStream.end();
   });
 });
+
 
 
 app.listen(PORT, () => {
