@@ -128,6 +128,18 @@ app.get('/logs/main', (req, res) => {
   });
 });
 
+app.get('/logs/memory', (req, res) => {
+  const memoryLogs = spawn('bash', ['-c', 'watch -n 1 free -h']);
+  res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+
+  memoryLogs.stdout.pipe(res);
+  memoryLogs.stderr.pipe(res);
+
+  req.on('close', () => {
+    memoryLogs.kill();
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`✅ Deploy panel running at http://localhost:${PORT}`);
 });

@@ -85,3 +85,7 @@ fi
 end_time=$(date +%s)
 duration=$((end_time - start_time))
 echo "✅ Деплой ветки $project:$branch занял ${duration}s"
+
+echo "📊 Загрузка памяти:"
+echo "----------------------"
+awk '/Mem|Swap/ {printf "%s: %s used / %s total\n", $1, $3, $2}' <(free -h)
