@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -39,10 +39,7 @@ export class AuthController {
   }
 
   @Post('/registration')
-  async registration(
-    @Body() userDto: CreateUserDto,
-    @Res({ passthrough: true }) response,
-  ) {
+  async registration(@Body() userDto: CreateUserDto, @Res({ passthrough: true }) response) {
     const data = await this.authService.registration(userDto);
     response.cookie('refreshToken', data.refreshToken, {
       maxAge: expireParseByHours(process.env.JWT_REFRESH_EXPIRATION),
@@ -52,11 +49,7 @@ export class AuthController {
   }
 
   @Post('/refresh')
-  async refresh(
-    @Body() { refreshToken }: RefreshDto,
-    @Req() request,
-    @Res({ passthrough: true }) response,
-  ) {
+  async refresh(@Body() { refreshToken }: RefreshDto, @Req() request, @Res({ passthrough: true }) response) {
     // can use it, if "refresh in cookies" case
     // const { refreshToken: cookiesRefreshToken } = request.cookies;
 
@@ -68,9 +61,6 @@ export class AuthController {
 
     return data;
   }
-
-
-
 
   @Post('/generateCode')
   @ApiOperation({ summary: 'Request a verification code' })
@@ -88,5 +78,29 @@ export class AuthController {
   @ApiOperation({ summary: 'Resend verification code' })
   async resendCode(@Body() { phoneNumber }: LoginDto) {
     return this.authService.resendCode(phoneNumber);
+  }
+
+  @Post('/logout')
+  @ApiOperation({ summary: 'Logout and invalidate refresh token' })
+  async logout(@Body() { refreshToken }: { refreshToken: string }) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('No refresh token provided');
+    }
+
+    try {
+      const payload = this.authService.verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET_HEX);
+
+      if (payload?.id) {
+        const user = await this.authService.getUserByTokenPayload(refreshToken);
+
+        if (user) {
+          await user.update({ refreshToken: null });
+        }
+      }
+    } catch (e) {
+      console.log(`LOGOUT ERROR: ${JSON.stringify(e)}`)
+    }
+
+    return { message: 'Logged out successfully' };
   }
 }

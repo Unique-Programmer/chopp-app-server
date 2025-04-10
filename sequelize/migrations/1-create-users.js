@@ -10,6 +10,7 @@ module.exports = {
         allowNull: false,
       },
       phoneNumber: { type: Sequelize.STRING, unique: true, allowNull: true },
+      refreshToken: { type: Sequelize.STRING, unique: true },
       verificationCode: { type: Sequelize.STRING, allowNull: true },
       verificationExpires: { type: Sequelize.DATE, allowNull: true },
       verificationAttempts: { type: Sequelize.INTEGER, defaultValue: 0 },

@@ -26,6 +26,9 @@ export class User extends Model<User, UserCreationAttrs> {
   })
   id: number;
 
+  @Column({ type: DataType.STRING, allowNull: true })
+  refreshToken?: string; // будет храниться как hash
+
   @Column({ type: DataType.STRING, unique: true, allowNull: true })
   phoneNumber?: string;
 

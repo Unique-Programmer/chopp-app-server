@@ -146,7 +146,10 @@ export class AuthService {
 
   async login(authDto: AuthDto) {
     const user = await this.checkValidityUser(authDto);
-    return this.generateTokens(user);
+    const tokens = await this.generateTokens(user);
+    const hashedToken = await this.hashToken(tokens.refreshToken);
+    await user.update({ refreshToken: hashedToken });
+    return tokens;
   }
 
   async registration(userDto: CreateUserDto) {
@@ -185,21 +188,31 @@ export class AuthService {
     if (!refreshToken) {
       throw new UnauthorizedException({ message: 'Refresh token not found' });
     }
-
+  
     const payload = this.verifyToken(refreshToken, process.env.JWT_REFRESH_SECRET_HEX);
-
+  
     if (!payload) {
       throw new UnauthorizedException({ message: 'Invalid refresh token' });
     }
-
+  
     const user = await this.usersService.getUserByFieldName(payload.id, 'id');
-
-    if (!user) {
-      throw new UnauthorizedException({ message: 'Invalid user' });
+  
+    if (!user || !user.refreshToken) {
+      throw new UnauthorizedException({ message: 'Invalid refresh token' });
     }
-
-    return this.generateTokens(user);
+  
+    const isMatch = await this.compareToken(refreshToken, user.refreshToken);
+    if (!isMatch) {
+      throw new UnauthorizedException({ message: 'Invalid refresh token' });
+    }
+  
+    const tokens = await this.generateTokens(user);
+    const newHashed = await this.hashToken(tokens.refreshToken);
+    await user.update({ refreshToken: newHashed });
+  
+    return tokens;
   }
+  
 
   async getUserByTokenPayload(accessToken: string) {
     try {
@@ -217,4 +230,12 @@ export class AuthService {
     // например, сравнение с хранимыми значениями в переменных окружения
     return login === process.env.SUPERADMIN_LOGIN && password === process.env.SUPERADMIN_PASSWORD;
   }
+
+  hashToken = async (token: string): Promise<string> => {
+    return bcrypt.hash(token, 5);
+  };
+
+  compareToken = async (token: string, hashed: string): Promise<boolean> => {
+    return bcrypt.compare(token, hashed);
+  };
 }
