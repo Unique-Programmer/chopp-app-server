@@ -18,6 +18,7 @@ import { NotificationService } from 'src/websockets/notification/notification.se
 import { User } from 'src/users/users.model';
 import { UpdatePaymentStatusDto } from './dto/update-payment-status.dto';
 import { OrderStats } from './order-stats.model';
+import { formatPhoneNumber } from 'src/shared/utils/phone-format.utils';
 
 @Injectable()
 export class OrderService {
@@ -73,7 +74,7 @@ export class OrderService {
     comment,
     address,
     phoneNumber,
-    name
+    name,
   }: { userId: number } & CreateOrderDTO): Promise<CreatePaymentResponseDto> {
     const transaction = await this.orderModel.sequelize.transaction();
 
@@ -85,6 +86,8 @@ export class OrderService {
 
       const cart = await this.getCart(userId, transaction);
 
+      phoneNumber = formatPhoneNumber(phoneNumber);
+
       const order = await this.orderModel.create(
         {
           userId,
@@ -93,7 +96,7 @@ export class OrderService {
           orderStatus: ORDER_STATUS.AWAITING_PAYMENT,
           paymentStatus: PAYMENT_STATUS.PENDING,
           phoneNumber,
-          name
+          name,
         },
         { transaction },
       );
@@ -255,20 +258,23 @@ export class OrderService {
     sort = 'createdAt',
     order = 'ASC',
     userId,
-  }: PaginationRequestQuery & { userId?: number; startDate?: string; endDate?: string; status?: ORDER_STATUS[] }): Promise<
-    PaginationResponse<Order>
-  > {
+  }: PaginationRequestQuery & {
+    userId?: number;
+    startDate?: string;
+    endDate?: string;
+    status?: ORDER_STATUS[];
+  }): Promise<PaginationResponse<Order>> {
     const offset = (page - 1) * limit;
-  
+
     const whereCondition: any = {};
-  
+
     // 🔍 Фильтр по ID заказа (если в search пришло число)
     if (search) {
       if (!isNaN(Number(search))) {
         whereCondition.id = Number(search);
       }
     }
-  
+
     // 📅 Фильтр по диапазону дат (включая границы)
     if (startDate || endDate) {
       whereCondition.createdAt = {};
@@ -279,16 +285,16 @@ export class OrderService {
         whereCondition.createdAt[Op.lte] = new Date(endDate); // Включает endDate
       }
     }
-  
+
     // ✅ Фильтр по статусу (если передан список статусов)
     if (status && status.length > 0) {
       whereCondition.orderStatus = { [Op.in]: status };
     }
-  
+
     if (userId) {
       whereCondition.userId = userId;
     }
-  
+
     const { rows: orders, count: totalItems } = await this.orderModel.findAndCountAll({
       where: whereCondition,
       limit,
@@ -307,7 +313,7 @@ export class OrderService {
         },
       ],
     });
-  
+
     return {
       items: orders,
       totalItems,
@@ -316,7 +322,6 @@ export class OrderService {
       limit,
     };
   }
-  
 
   async findOneOrder(id: number): Promise<Order> {
     const order = await this.orderModel.findOne({

@@ -8,6 +8,7 @@ import { AuthDto } from './dto/auth.dto';
 import { ERROR_MESSAGES } from 'src/shared/enums';
 import { USER_ROLE } from 'src/shared/enums';
 import { SubmitLoginService } from '../submit-login/submit-login.service';
+import { formatPhoneNumber } from 'src/shared/utils/phone-format.utils';
 
 @Injectable()
 export class AuthService {
@@ -42,6 +43,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid phone number.');
     }
 
+    phoneNumber = formatPhoneNumber(phoneNumber);
+
     let user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
     if (!user) {
@@ -68,6 +71,7 @@ export class AuthService {
     if (!phoneNumber) {
       throw new UnauthorizedException('Invalid phone number or verification code.');
     }
+    phoneNumber = formatPhoneNumber(phoneNumber);
 
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
 
@@ -99,6 +103,7 @@ export class AuthService {
   }
 
   async resendCode(phoneNumber: string) {
+    phoneNumber = formatPhoneNumber(phoneNumber);
     const user = await this.usersService.getUserByFieldName(phoneNumber, 'phoneNumber');
     if (!user) throw new UnauthorizedException('Phone number not found');
 
@@ -121,7 +126,9 @@ export class AuthService {
     if (authDto.email) {
       user = await this.usersService.getUserByFieldName(authDto.email, 'email', true);
     } else if (authDto.phoneNumber) {
-      user = await this.usersService.getUserByFieldName(authDto.phoneNumber, 'phoneNumber', true);
+      let userPhone = authDto.phoneNumber;
+      userPhone = formatPhoneNumber(userPhone);
+      user = await this.usersService.getUserByFieldName(userPhone, 'phoneNumber', true);
     } else {
       throw new UnauthorizedException({
         message: ERROR_MESSAGES.INCORRECT_LOGIN_OR_PASSWORD,
@@ -158,8 +165,9 @@ export class AuthService {
     if (candidateByEmain) {
       throw new HttpException('User with this email already exist', HttpStatus.BAD_REQUEST);
     }
-
-    const candidateByPhoneNumber = await this.usersService.getUserByFieldName(userDto.phoneNumber, 'phoneNumber');
+    let userPhone = userDto.phoneNumber;
+    userPhone = formatPhoneNumber(userPhone);
+    const candidateByPhoneNumber = await this.usersService.getUserByFieldName(userPhone, 'phoneNumber');
 
     if (candidateByPhoneNumber) {
       throw new HttpException('User with this phone number already exist', HttpStatus.BAD_REQUEST);
