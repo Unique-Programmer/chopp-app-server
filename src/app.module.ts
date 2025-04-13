@@ -38,13 +38,13 @@ import { FileCleanupModule } from './file-cleanup/file-cleanup.module';
 import { SubmitLoginModule } from './submit-login/submit-login.module';
 import { TelegramModule } from './telegram/telegram.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { SystemMonitorModule } from './system-monitor/system-monitor.module';
 import * as redisStore from 'cache-manager-redis-store';
 
 const isDev = process.env.NODE_ENV === 'development';
 const isProd = process.env.NODE_ENV === 'production';
 
-
-console.log('process.env: ', process.env)
+console.log('process.env: ', process.env);
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -115,6 +115,7 @@ console.log('process.env: ', process.env)
     ScheduleModule.forRoot(),
     TelegramModule,
     SubmitLoginModule,
+    SystemMonitorModule,
   ],
   controllers: [],
   providers: [],
