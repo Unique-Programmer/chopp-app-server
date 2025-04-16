@@ -1,0 +1,67 @@
+# compiled output
+/dist
+/node_modules
+/build
+/uploads
+/deploy-stage-server/node_modules/
+/deploy-stage-server/package-lock.json
+/deploy-stage-server/package.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# OS
+.DS_Store
+
+# Tests
+/coverage
+/.nyc_output
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotenv environment variable files
+.env
+.env.development.local
+.env.development
+.env.test.local
+.env.production.local
+.env.production
+.env.local
+.env.stg
+
+start-this-shit.sh
+
+# temp directory
+.temp
+.tmp
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+logs.txt
+.env.production
+.env.development
+docker-compose.production.yml
+docker-compose.yml
