@@ -4,26 +4,27 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Multer } from 'multer';
 import * as express from 'express';
 import { LoggerInterceptor } from './interceptors/logger.interceptor';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as path from 'path';
 
 const DEFAULT_API_PREFIX = 'api';
 
 async function bootstrap() {
   const PORT = process.env.PORT || 5000;
   const API_PREFIX = process.env.API_PREFIX || DEFAULT_API_PREFIX;
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   app.enableCors({ origin: '*', allowedHeaders: '*' });
 
   app.setGlobalPrefix(API_PREFIX);
 
   app.use('/uploads', express.static('./uploads'));
-
-// 👇 Подключи interceptor
-app.useGlobalInterceptors(new LoggerInterceptor());
-    // 👇 Подключаем логгер
-    // const logger = new LoggerMiddleware();
-    // app.use(logger.use.bind(logger));
-
+  app.useStaticAssets(path.join(__dirname, '..', 'public'));
+  // 👇 Подключи interceptor
+  app.useGlobalInterceptors(new LoggerInterceptor());
+  // 👇 Подключаем логгер
+  // const logger = new LoggerMiddleware();
+  // app.use(logger.use.bind(logger));
 
   const config = new DocumentBuilder()
     .setTitle("Chopp app's methods description")
@@ -42,12 +43,9 @@ app.useGlobalInterceptors(new LoggerInterceptor());
   //   },
   // ];
 
-
   SwaggerModule.setup(`/docs`, app, document);
 
-  await app.listen(PORT, () =>
-    console.log(`server started on port === ${PORT}`),
-  );
+  await app.listen(PORT, () => console.log(`server started on port === ${PORT}`));
 }
 
 bootstrap();

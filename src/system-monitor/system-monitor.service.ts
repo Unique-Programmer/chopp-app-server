@@ -11,6 +11,11 @@ import {
   DockerContainerNetworkDto,
 } from './dto/system-monitor.dto';
 import * as Docker from 'dockerode';
+import * as fs from 'fs';
+import * as path from 'path';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { formatDate } from '../shared/utils/system-monitor-utils';
+import { Response } from 'express';
 
 @Injectable()
 export class SystemMonitorService {
@@ -114,5 +119,61 @@ export class SystemMonitorService {
     );
 
     return stats;
+  }
+
+  @Cron('0 */5 * * * *')
+  async logSystemStatsJob() {
+    const stats = await this.getSystemStats();
+    const logDir = path.join(process.cwd(), 'logs');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const logFile = path.join(logDir, `system-monitor-${dateStr}.log`);
+
+    if (!fs.existsSync(logDir)) {
+      fs.mkdirSync(logDir, { recursive: true });
+    }
+
+    const logLine = `[${formatDate(new Date())}] ${JSON.stringify(stats, null, 2)}\n`;
+    console.log(logLine);
+    try {
+      fs.appendFile(logFile, logLine, (err) => {
+        if (err) Logger.error('Error writing to log file:', err.message);
+      });
+    } catch (error) {
+      Logger.error('Error writing to log file:', error.message);
+    }
+  }
+
+  async getSystemMotinorLogFile(res: Response) {
+    const logDir = path.join(process.cwd(), 'logs');
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const logPath = path.join(logDir, `system-monitor-${dateStr}.log`);
+    if (!fs.existsSync(logPath)) {
+      throw new ServiceUnavailableException('Log file not found');
+    }
+    const logContent = fs.readFileSync(logPath, 'utf-8');
+    res.type('text/plain').send(logContent);
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async cleanOldLogsJob() {
+    const logDir = path.join(process.cwd(), 'logs');
+    const files = fs.existsSync(logDir) ? fs.readdirSync(logDir) : [];
+    const now = Date.now();
+    const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+    files.forEach((file) => {
+      if (file.startsWith('system-monitor-') && file.endsWith('.log')) {
+        const filePath = path.join(logDir, file);
+        const stats = fs.statSync(filePath);
+        if (now - stats.mtimeMs > weekMs) {
+          try {
+            fs.unlinkSync(filePath);
+            Logger.log(`Deleted old log file: ${file}`);
+          } catch (error) {
+            `Failed to delete log file ${file}: ${error.message}`;
+          }
+        }
+      }
+    });
   }
 }
