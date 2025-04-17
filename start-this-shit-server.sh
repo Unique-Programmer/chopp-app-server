@@ -21,6 +21,9 @@ cd chopp-app-server
 echo "📄 Вставь содержимое .env.production (заверши ввод CTRL+D):"
 cat > .env.production
 
+echo "📄 Вставь содержимое docker-compose.production.yml (заверши ввод CTRL+D):"
+cat > docker-compose.production.yml
+
 echo "📦 Устанавливаем зависимости..."
 npm install
 
