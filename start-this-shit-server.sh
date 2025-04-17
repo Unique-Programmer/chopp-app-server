@@ -8,9 +8,6 @@ mkdir -p /home/chopp/app-backend
 echo "🌐 Переходим в директорию..."
 cd /home/chopp/app-backend
 
-echo "🔽 Клонируем репозиторий..."
-git clone https://github.com/Unique-Programmer/chopp-app-server.git
-
 echo "📁 Переход в проект..."
 cd chopp-app-server
 
