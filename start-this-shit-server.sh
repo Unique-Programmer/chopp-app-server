@@ -2,10 +2,6 @@
 
 set -e
 
-echo "🧱 Обновляем пакеты и устанавливаем зависимости..."
-apt-get update
-apt-get install -y docker.io docker-compose git npm
-
 echo "📁 Создаём директории..."
 mkdir -p /home/chopp/app-backend
 
