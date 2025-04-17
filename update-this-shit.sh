@@ -17,12 +17,12 @@ handle_error() {
   exit 1
 }
 
-# 1. Пулл backend (ветка main)
-log_step "Переход в $BACKEND_DIR и пулл backend ветки main"
+# 1. Пулл backend (ветка master)
+log_step "Переход в $BACKEND_DIR и пулл backend ветки master"
 cd "$BACKEND_DIR" || handle_error "Не удалось перейти в $BACKEND_DIR"
 git fetch origin || handle_error "Git fetch в backend"
-git checkout main || handle_error "Git checkout main в backend"
-git pull origin main || handle_error "Git pull main в backend"
+git checkout master || handle_error "Git checkout master в backend"
+git pull origin master || handle_error "Git pull master в backend"
 npm i || handle_error "npm i failed"
 
 # 2. Пулл и билд frontend admin (ветка main)
